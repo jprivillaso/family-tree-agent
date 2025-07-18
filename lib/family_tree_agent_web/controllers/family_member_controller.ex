@@ -168,21 +168,7 @@ defmodule FamilyTreeAgentWeb.FamilyMemberController do
     end
   end
 
-  @doc """
-  OPTIONS /api/family_members/*
-  Handles preflight CORS requests.
-  """
-  def options(conn, _params) do
-    conn
-    |> put_status(:ok)
-    |> put_resp_header("access-control-allow-origin", "*")
-    |> put_resp_header("access-control-allow-methods", "GET, POST, PUT, DELETE, OPTIONS")
-    |> put_resp_header("access-control-allow-headers", "content-type, authorization")
-    |> send_resp(200, "")
-  end
-
   # Private helper functions
-
   defp format_member(member) do
     %{
       id: member.id,

@@ -137,9 +137,7 @@ defmodule FamilyTreeAgent.FamilyTree do
 
     %{
       total_members: length(members),
-      members: format_members_for_json(members),
-      relationships: build_relationships_map(members),
-      generations: build_generations(members)
+      members: format_members_for_json(members)
     }
   end
 
@@ -180,30 +178,4 @@ defmodule FamilyTreeAgent.FamilyTree do
 
   defp format_date(nil), do: nil
   defp format_date(date), do: Date.to_iso8601(date)
-
-  defp build_relationships_map(members) do
-    members
-    |> Enum.reduce(%{}, fn member, acc ->
-      Map.put(acc, member.id, member.relationships)
-    end)
-  end
-
-  defp build_generations(members) do
-    # Basic generation building - can be enhanced later
-    members
-    |> Enum.group_by(fn member ->
-      case member.birth_date do
-        nil -> "Unknown"
-        date -> "#{div(date.year, 10) * 10}s"
-      end
-    end)
-    |> Enum.map(fn {decade, members} ->
-      %{
-        decade: decade,
-        count: length(members),
-        members: Enum.map(members, & &1.id)
-      }
-    end)
-    |> Enum.sort_by(& &1.decade)
-  end
 end
