@@ -35,3 +35,4 @@ family_tree_agent-*.tar
 npm-debug.log
 /assets/node_modules/
 
+/config/dev_secret.exs

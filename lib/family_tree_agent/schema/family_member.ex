@@ -18,7 +18,7 @@ defmodule FamilyTreeAgent.Schema.FamilyMember do
   @doc false
   def changeset(family_member, attrs) do
     family_member
-    |> cast(attrs, [:name, :birth_date, :death_date, :bio, :relationships, :metadata])
+    |> cast(attrs, [:id, :name, :birth_date, :death_date, :bio, :relationships, :metadata])
     |> validate_required([:name])
     |> validate_birth_death_dates()
   end
