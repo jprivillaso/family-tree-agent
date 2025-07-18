@@ -21,9 +21,17 @@ defmodule FamilyTreeAgentWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", FamilyTreeAgentWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", FamilyTreeAgentWeb do
+    pipe_through :api
+
+    resources "/family_members", FamilyMemberController, except: [:new, :edit]
+    get "/family_tree", FamilyTreeController, :show
+
+    # OPTIONS routes for CORS support
+    options "/family_members", FamilyMemberController, :options
+    options "/family_members/:id", FamilyMemberController, :options
+    options "/family_tree", FamilyTreeController, :options
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:family_tree_agent, :dev_routes) do
