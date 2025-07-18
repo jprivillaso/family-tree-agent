@@ -28,9 +28,9 @@ defmodule FamilyTreeAgentWeb.Router do
     get "/family_tree", FamilyTreeController, :show
 
     # OPTIONS routes for CORS support
+    options "/family_tree", FamilyTreeController, :options
     options "/family_members", FamilyMemberController, :options
     options "/family_members/:id", FamilyMemberController, :options
-    options "/family_tree", FamilyTreeController, :options
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
