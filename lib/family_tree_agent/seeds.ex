@@ -17,8 +17,8 @@ defmodule FamilyTreeAgent.Seeds do
 
   """
   def run do
-    # Path to the JSON file
-    json_file_path = "priv/family_data/family_members.json"
+    # Path to the JSON file using the correct priv directory
+    json_file_path = Path.join(:code.priv_dir(:family_tree_agent), "family_data/family_members.json")
 
     # Load and process JSON data
     case File.read(json_file_path) do
