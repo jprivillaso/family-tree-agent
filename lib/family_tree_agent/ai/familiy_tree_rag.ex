@@ -61,15 +61,28 @@ defmodule FamilyTreeRAG do
     IO.puts("Attempting to load chat model...")
 
     try do
-      {:ok, chat_model} = Bumblebee.load_model({:hf, @chat_model_repo, auth_token: "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"})
-      {:ok, chat_tokenizer} = Bumblebee.load_tokenizer({:hf, @chat_model_repo, auth_token: "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"})
-      {:ok, generation_config} = Bumblebee.load_generation_config({:hf, @chat_model_repo, auth_token: "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"})
+      {:ok, chat_model} =
+        Bumblebee.load_model(
+          {:hf, @chat_model_repo, auth_token: "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"}
+        )
+
+      {:ok, chat_tokenizer} =
+        Bumblebee.load_tokenizer(
+          {:hf, @chat_model_repo, auth_token: "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"}
+        )
+
+      {:ok, generation_config} =
+        Bumblebee.load_generation_config(
+          {:hf, @chat_model_repo, auth_token: "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"}
+        )
 
       # Configure generation parameters - focused responses
       generation_config =
         Bumblebee.configure(generation_config,
-          max_new_tokens: 30,  # Very short to force concise answers
-          temperature: 0.1     # Low temperature for more focused, deterministic responses
+          # Very short to force concise answers
+          max_new_tokens: 30,
+          # Low temperature for more focused, deterministic responses
+          temperature: 0.1
         )
 
       IO.puts("✅ Chat model loaded successfully!")
@@ -343,8 +356,9 @@ defmodule FamilyTreeRAG do
         IO.puts("\n🔍 Retrieving relevant documents...")
         relevant_docs_with_scores = similarity_search(rag_system, query, 3)
 
-        relevant_docs_with_scores = relevant_docs_with_scores
-        |> Enum.reject(fn {doc, score} -> score < 0.05 end)
+        relevant_docs_with_scores =
+          relevant_docs_with_scores
+          |> Enum.reject(fn {doc, score} -> score < 0.05 end)
 
         IO.puts("\n📄 Top 3 most relevant documents:")
         IO.inspect(relevant_docs_with_scores)

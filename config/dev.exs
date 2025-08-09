@@ -85,5 +85,4 @@ config :phoenix_live_view,
 config :swoosh, :api_client, false
 
 # OpenAI configuration
-config :family_tree_agent, :openai,
-  api_key: System.get_env("OPENAI_API_KEY")
+config :family_tree_agent, :openai, api_key: System.get_env("OPENAI_API_KEY")
