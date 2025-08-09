@@ -32,7 +32,9 @@ defmodule FamilyTreeAgent.Agents.Agent do
 
       multiple_people ->
         person_names = Enum.map(multiple_people, & &1.name)
-        {:error, "Multiple people found with similar names: #{Enum.join(person_names, ", ")}. Please be more specific."}
+
+        {:error,
+         "Multiple people found with similar names: #{Enum.join(person_names, ", ")}. Please be more specific."}
     end
   end
 
@@ -65,7 +67,8 @@ defmodule FamilyTreeAgent.Agents.Agent do
         search_variations = [
           String.downcase(name),
           String.trim(name),
-          name |> String.split() |> List.first() # First name only
+          # First name only
+          name |> String.split() |> List.first()
         ]
 
         Enum.reduce(search_variations, [], fn variation, acc ->
@@ -76,7 +79,8 @@ defmodule FamilyTreeAgent.Agents.Agent do
           end
         end)
 
-      results -> results
+      results ->
+        results
     end
   end
 
@@ -183,8 +187,10 @@ defmodule FamilyTreeAgent.Agents.Agent do
       case value do
         list when is_list(list) ->
           "#{key}: #{Enum.join(list, ", ")}"
+
         single when is_binary(single) ->
           "#{key}: #{single}"
+
         _ ->
           "#{key}: #{inspect(value)}"
       end
@@ -200,6 +206,7 @@ defmodule FamilyTreeAgent.Agents.Agent do
       case value do
         list when is_list(list) ->
           "#{key}: #{Enum.join(list, ", ")}"
+
         single ->
           "#{key}: #{single}"
       end
@@ -212,7 +219,7 @@ defmodule FamilyTreeAgent.Agents.Agent do
   defp format_date_for_ai(nil), do: nil
   defp format_date_for_ai(date), do: Date.to_iso8601(date)
 
-    defp call_openai(system_prompt, user_prompt) do
+  defp call_openai(system_prompt, user_prompt) do
     openai_config = Application.get_env(:family_tree_agent, :openai, [])
     api_key = Keyword.get(openai_config, :api_key) || System.get_env("OPENAI_API_KEY")
 
@@ -227,12 +234,14 @@ defmodule FamilyTreeAgent.Agents.Agent do
         ChatMessage.user(user_prompt)
       ]
 
-      request = Chat.Completions.new(
-        model: "gpt-4o", # Using gpt-4o as it's the latest GPT-4 model
-        messages: messages,
-        max_tokens: 500,
-        temperature: 0.7
-      )
+      request =
+        Chat.Completions.new(
+          # Using gpt-4o as it's the latest GPT-4 model
+          model: "gpt-4o",
+          messages: messages,
+          max_tokens: 500,
+          temperature: 0.7
+        )
 
       case Chat.Completions.create(client, request) do
         {:ok, %{"choices" => [%{"message" => %{"content" => content}} | _]}} ->

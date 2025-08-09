@@ -18,7 +18,8 @@ defmodule FamilyTreeAgent.Seeds do
   """
   def run do
     # Path to the JSON file using the correct priv directory
-    json_file_path = Path.join(:code.priv_dir(:family_tree_agent), "family_data/family_members.json")
+    json_file_path =
+      Path.join(:code.priv_dir(:family_tree_agent), "family_data/family_members.json")
 
     # Load and process JSON data
     case File.read(json_file_path) do
@@ -67,18 +68,19 @@ defmodule FamilyTreeAgent.Seeds do
     }
 
     # Add ID if provided in JSON
-    member_attrs = if member_data["id"] do
-      Map.put(member_attrs, :id, member_data["id"])
-    else
-      member_attrs
-    end
+    member_attrs =
+      if member_data["id"] do
+        Map.put(member_attrs, :id, member_data["id"])
+      else
+        member_attrs
+      end
 
     changeset = FamilyMember.changeset(%FamilyMember{}, member_attrs)
 
     case Repo.insert(changeset,
-      on_conflict: :nothing,
-      conflict_target: :id
-    ) do
+           on_conflict: :nothing,
+           conflict_target: :id
+         ) do
       {:ok, member} ->
         IO.puts("✓ Created: #{member.name} (ID: #{member.id})")
 
@@ -100,9 +102,9 @@ defmodule FamilyTreeAgent.Seeds do
     changeset = FamilyMember.changeset(%FamilyMember{}, sample_attrs)
 
     case Repo.insert(changeset,
-      on_conflict: :nothing,
-      conflict_target: :id
-    ) do
+           on_conflict: :nothing,
+           conflict_target: :id
+         ) do
       {:ok, member} ->
         IO.puts("✓ Created sample member: #{member.name} (ID: #{member.id})")
 
@@ -113,6 +115,7 @@ defmodule FamilyTreeAgent.Seeds do
   end
 
   defp parse_date(nil), do: nil
+
   defp parse_date(date_string) when is_binary(date_string) do
     case Date.from_iso8601(date_string) do
       {:ok, date} -> date
