@@ -20,6 +20,10 @@ defmodule FamilyTreeRAG do
     :vector_store
   ]
 
+  def huggingface_token do
+    Application.fetch_env!(:family_tree_agent, :huggingface_token)
+  end
+
   @doc """
   Initialize the RAG system with embedding model and document processing.
   Chat model loading is optional and will fallback gracefully if it fails.
@@ -41,8 +45,7 @@ defmodule FamilyTreeRAG do
 
     IO.puts("Creating embeddings for #{length(chunks)} chunks...")
 
-    documents_with_embeddings =
-      create_embeddings_for_chunks(chunks, embedding_model, embedding_tokenizer)
+    documents_with_embeddings = create_embeddings_for_chunks(chunks, embedding_model, embedding_tokenizer)
 
     IO.puts("Building vector store...")
     vector_store = SimpleVectorStore.new(documents_with_embeddings)
@@ -60,20 +63,22 @@ defmodule FamilyTreeRAG do
   defp load_chat_model do
     IO.puts("Attempting to load chat model...")
 
+    huggingface_token = huggingface_token()
+
     try do
       {:ok, chat_model} =
         Bumblebee.load_model(
-          {:hf, @chat_model_repo, auth_token: "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"}
+          {:hf, @chat_model_repo, auth_token: huggingface_token}
         )
 
       {:ok, chat_tokenizer} =
         Bumblebee.load_tokenizer(
-          {:hf, @chat_model_repo, auth_token: "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"}
+          {:hf, @chat_model_repo, auth_token: huggingface_token}
         )
 
       {:ok, generation_config} =
         Bumblebee.load_generation_config(
-          {:hf, @chat_model_repo, auth_token: "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"}
+          {:hf, @chat_model_repo, auth_token: huggingface_token}
         )
 
       # Configure generation parameters - focused responses
@@ -174,8 +179,6 @@ defmodule FamilyTreeRAG do
 
     # Get embeddings from the model
     outputs = Axon.predict(model.model, model.params, inputs)
-
-    IO.inspect(outputs)
 
     # Handle the sentence-transformers model output format
     # The model returns: %{hidden_states: #Axon.None<...>, attentions: #Axon.None<...>, logits: #Nx.Tensor<...>}
@@ -358,7 +361,7 @@ defmodule FamilyTreeRAG do
 
         relevant_docs_with_scores =
           relevant_docs_with_scores
-          |> Enum.reject(fn {doc, score} -> score < 0.05 end)
+          |> Enum.reject(fn {_doc, score} -> score < 0.05 end)
 
         IO.puts("\n📄 Top 3 most relevant documents:")
         IO.inspect(relevant_docs_with_scores)
