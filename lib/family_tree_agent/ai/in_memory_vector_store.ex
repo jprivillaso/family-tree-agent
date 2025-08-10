@@ -1,4 +1,4 @@
-defmodule SimpleVectorStore do
+defmodule FamilyTreeAgent.AI.InMemoryVectorStore do
   @moduledoc """
   A simple in-memory vector store using Nx for similarity calculations.
   This avoids the complexity of external dependencies while providing working RAG functionality.

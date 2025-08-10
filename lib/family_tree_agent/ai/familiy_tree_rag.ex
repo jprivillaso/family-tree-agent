@@ -4,12 +4,12 @@ defmodule FamilyTreeRAG do
   This version includes both retrieval and natural language generation capabilities.
   """
 
+  alias FamilyTreeAgent.AI.FileProcessor
+  alias FamilyTreeAgent.AI.InMemoryVectorStore
+
   # Configuration
   @embedding_model_repo "sentence-transformers/all-MiniLM-L6-v2"
   @chat_model_repo "google/gemma-2b"
-  @context_file_path Path.join([__DIR__, "context.txt"])
-  @chunk_size 200
-  @chunk_overlap 20
 
   defstruct [
     :embedding_model,
@@ -25,10 +25,21 @@ defmodule FamilyTreeRAG do
   end
 
   @doc """
-  Initialize the RAG system with embedding model and document processing.
-  Chat model loading is optional and will fallback gracefully if it fails.
+  Main function to run the RAG system interactively.
   """
-  def init do
+  def run do
+    rag_system = init()
+
+    IO.puts("\n✅ RAG System initialized successfully!")
+    IO.puts("💡 Try questions like:")
+    IO.puts("   - 'Tell me about Jane Doe'")
+    IO.puts("   - 'What are Alice's hobbies?'")
+    IO.puts("   - 'Who is married to John Doe?'")
+
+    interactive_loop(rag_system)
+  end
+
+  defp init do
     # Set EXLA as the default backend for better performance
     Nx.global_default_backend(EXLA.Backend)
 
@@ -36,12 +47,11 @@ defmodule FamilyTreeRAG do
     {:ok, embedding_model} = Bumblebee.load_model({:hf, @embedding_model_repo})
     {:ok, embedding_tokenizer} = Bumblebee.load_tokenizer({:hf, @embedding_model_repo})
 
-    # Try to load chat model, but don't fail if it doesn't work
-    {chat_model, chat_tokenizer, generation_config} = load_chat_model()
+    {chat_model, chat_tokenizer, generation_config} = load_chat_model!()
 
     IO.puts("Loading and processing documents...")
-    documents = load_documents(@context_file_path)
-    chunks = split_documents(documents)
+    documents = FileProcessor.load_documents()
+    chunks = FileProcessor.split_documents(documents)
 
     IO.puts("Creating embeddings for #{length(chunks)} chunks...")
 
@@ -49,7 +59,7 @@ defmodule FamilyTreeRAG do
       create_embeddings_for_chunks(chunks, embedding_model, embedding_tokenizer)
 
     IO.puts("Building vector store...")
-    vector_store = SimpleVectorStore.new(documents_with_embeddings)
+    vector_store = InMemoryVectorStore.new(documents_with_embeddings)
 
     %__MODULE__{
       embedding_model: embedding_model,
@@ -61,7 +71,43 @@ defmodule FamilyTreeRAG do
     }
   end
 
-  defp load_chat_model do
+  defp interactive_loop(rag_system) do
+    query = IO.gets("\nEnter your query (or 'exit' to exit): ") |> String.trim()
+
+    case query do
+      "exit" ->
+        IO.puts("👋 Goodbye!")
+
+      "" ->
+        IO.puts("Please enter a valid query.")
+        interactive_loop(rag_system)
+
+      _ ->
+        IO.puts("\n🔍 Retrieving relevant documents...")
+        relevant_docs_with_scores = similarity_search(rag_system, query, 3)
+
+        relevant_docs_with_scores =
+          Enum.reject(relevant_docs_with_scores, fn {_doc, score} -> score < 0.05 end)
+
+        IO.puts("\n📄 Top 3 most relevant documents:")
+        IO.puts(relevant_docs_with_scores)
+
+        relevant_docs_with_scores
+        |> Enum.with_index(1)
+        |> Enum.each(fn {{chunk, score}, index} ->
+          preview = String.slice(chunk, 0, 100) <> "..."
+          IO.puts("#{index}. (Score: #{Float.round(score, 3)}) #{preview}")
+          IO.puts(String.duplicate("-", 50))
+        end)
+
+        response = generate_ai_response(rag_system, query, relevant_docs_with_scores)
+        IO.puts("\n💬 Response:\n#{response}")
+
+        interactive_loop(rag_system)
+    end
+  end
+
+  defp load_chat_model! do
     IO.puts("Attempting to load chat model...")
 
     huggingface_token = huggingface_token()
@@ -89,155 +135,9 @@ defmodule FamilyTreeRAG do
       {chat_model, chat_tokenizer, generation_config}
     rescue
       error ->
-        IO.puts("⚠️  Chat model loading failed: #{inspect(error)}")
-        IO.puts("📝 Will use structured responses instead of natural language generation.")
-        {nil, nil, nil}
+        IO.puts("⚠️ Chat model loading failed: #{inspect(error)}")
+        raise error
     end
-  end
-
-  @doc """
-  Load documents from the context file.
-  """
-  def load_documents(file_path) do
-    case File.read(file_path) do
-      {:ok, content} ->
-        case Jason.decode(content) do
-          {:ok, %{"family_members" => family_members}} ->
-            Enum.map(family_members, fn member ->
-              Jason.encode!(member)
-            end)
-
-          {:error, reason} ->
-            raise "Failed to parse JSON: #{inspect(reason)}"
-        end
-
-      {:error, reason} ->
-        raise "Failed to read file: #{inspect(reason)}"
-    end
-  end
-
-  @doc """
-  Split documents into smaller chunks for processing.
-  """
-  def split_documents(documents) do
-    Enum.flat_map(documents, fn doc ->
-      split_text_into_chunks(doc, @chunk_size, @chunk_overlap)
-    end)
-  end
-
-  defp split_text_into_chunks(text, chunk_size, chunk_overlap) do
-    words = String.split(text, ~r/\s+/)
-
-    if length(words) <= chunk_size do
-      [text]
-    else
-      chunk_words(words, chunk_size, chunk_overlap, [])
-    end
-  end
-
-  defp chunk_words([], _chunk_size, _overlap, acc), do: Enum.reverse(acc)
-
-  defp chunk_words(words, chunk_size, _overlap, acc) when length(words) <= chunk_size do
-    chunk = Enum.join(words, " ")
-    Enum.reverse([chunk | acc])
-  end
-
-  defp chunk_words(words, chunk_size, overlap, acc) do
-    {chunk_words, _remaining_words} = Enum.split(words, chunk_size)
-    chunk = Enum.join(chunk_words, " ")
-
-    # Calculate overlap for next chunk
-    overlap_size = min(overlap, chunk_size)
-    next_words = Enum.drop(words, chunk_size - overlap_size)
-
-    chunk_words(next_words, chunk_size, overlap, [chunk | acc])
-  end
-
-  @doc """
-  Create embeddings for all chunks and return {chunk, embedding} pairs.
-  """
-  def create_embeddings_for_chunks(chunks, model, tokenizer) do
-    IO.puts("Processing embeddings for #{length(chunks)} chunks...")
-
-    chunks
-    |> Enum.with_index()
-    |> Enum.map(fn {chunk, idx} ->
-      IO.puts("Processing chunk #{idx + 1}/#{length(chunks)}")
-
-      embedding = create_embedding(chunk, model, tokenizer)
-      {chunk, embedding}
-    end)
-  end
-
-  defp create_embedding(text, model, tokenizer) do
-    # Tokenize the input text
-    inputs = Bumblebee.apply_tokenizer(tokenizer, text)
-
-    # Get embeddings from the model
-    outputs = Axon.predict(model.model, model.params, inputs)
-
-    # Handle the sentence-transformers model output format
-    # The model returns: %{hidden_states: #Axon.None<...>, attentions: #Axon.None<...>, logits: #Nx.Tensor<...>}
-    # We need to find actual tensors and ignore Axon.None values
-    embedding_tensor =
-      cond do
-        Map.has_key?(outputs, :logits) and match?(%Nx.Tensor{}, outputs.logits) ->
-          # For sentence transformers, we use the logits and do mean pooling
-          outputs.logits
-          # Mean pool across sequence length
-          |> Nx.mean(axes: [1])
-          # Remove batch dimension
-          |> Nx.squeeze(axes: [0])
-
-        Map.has_key?(outputs, :hidden_states) and match?(%Nx.Tensor{}, outputs.hidden_states) ->
-          # Some models use hidden_states (plural) - but only if it's a tensor
-          outputs.hidden_states
-          |> Nx.mean(axes: [1])
-          |> Nx.squeeze(axes: [0])
-
-        Map.has_key?(outputs, :hidden_state) and match?(%Nx.Tensor{}, outputs.hidden_state) ->
-          # Some models use hidden_state (singular) - but only if it's a tensor
-          outputs.hidden_state
-          |> Nx.mean(axes: [1])
-          |> Nx.squeeze(axes: [0])
-
-        true ->
-          # Fallback: find the first actual tensor in outputs (ignore Axon.None values)
-          actual_tensor =
-            outputs
-            |> Map.values()
-            |> Enum.find(&match?(%Nx.Tensor{}, &1))
-
-          case actual_tensor do
-            nil ->
-              IO.puts("Available outputs: #{inspect(Map.keys(outputs))}")
-
-              outputs
-              |> Map.to_list()
-              |> Enum.each(fn {k, v} ->
-                IO.puts("#{k}: #{inspect(v, structs: false, limit: 2)}")
-              end)
-
-              raise "No tensor found in model outputs: #{inspect(Map.keys(outputs))}"
-
-            tensor ->
-              tensor
-              |> Nx.mean(axes: [1])
-              |> Nx.squeeze(axes: [0])
-          end
-      end
-
-    embedding_tensor
-  end
-
-  @doc """
-  Perform similarity search to find relevant documents.
-  """
-  def similarity_search(rag_system, query, k \\ 3) do
-    query_embedding =
-      create_embedding(query, rag_system.embedding_model, rag_system.embedding_tokenizer)
-
-    SimpleVectorStore.similarity_search(rag_system.vector_store, query_embedding, k)
   end
 
   defp generate_ai_response(rag_system, query, relevant_docs_with_scores) do
@@ -320,55 +220,84 @@ defmodule FamilyTreeRAG do
     end
   end
 
-  @doc """
-  Main function to run the RAG system interactively.
-  """
-  def run do
-    rag_system = init()
+  defp similarity_search(rag_system, query, k) do
+    query_embedding =
+      create_embedding(query, rag_system.embedding_model, rag_system.embedding_tokenizer)
 
-    IO.puts("\n✅ RAG System initialized successfully!")
-    IO.puts("💡 Try questions like:")
-    IO.puts("   - 'Tell me about Jane Doe'")
-    IO.puts("   - 'What are Alice's hobbies?'")
-    IO.puts("   - 'Who is married to John Doe?'")
-
-    interactive_loop(rag_system)
+    InMemoryVectorStore.similarity_search(rag_system.vector_store, query_embedding, k)
   end
 
-  defp interactive_loop(rag_system) do
-    query = IO.gets("\nEnter your query (or 'quit' to exit): ") |> String.trim()
+  defp create_embeddings_for_chunks(chunks, model, tokenizer) do
+    IO.puts("Processing embeddings for #{length(chunks)} chunks...")
 
-    case query do
-      "quit" ->
-        IO.puts("👋 Goodbye!")
+    chunks
+    |> Enum.with_index()
+    |> Enum.map(fn {chunk, idx} ->
+      IO.puts("Processing chunk #{idx + 1}/#{length(chunks)}")
 
-      "" ->
-        IO.puts("Please enter a valid query.")
-        interactive_loop(rag_system)
+      embedding = create_embedding(chunk, model, tokenizer)
+      {chunk, embedding}
+    end)
+  end
 
-      _ ->
-        IO.puts("\n🔍 Retrieving relevant documents...")
-        relevant_docs_with_scores = similarity_search(rag_system, query, 3)
+  defp create_embedding(text, model, tokenizer) do
+    # Tokenize the input text
+    inputs = Bumblebee.apply_tokenizer(tokenizer, text)
 
-        relevant_docs_with_scores =
-          relevant_docs_with_scores
-          |> Enum.reject(fn {_doc, score} -> score < 0.05 end)
+    # Get embeddings from the model
+    outputs = Axon.predict(model.model, model.params, inputs)
 
-        IO.puts("\n📄 Top 3 most relevant documents:")
-        IO.inspect(relevant_docs_with_scores)
+    # Handle the sentence-transformers model output format
+    # The model returns: %{hidden_states: #Axon.None<...>, attentions: #Axon.None<...>, logits: #Nx.Tensor<...>}
+    # We need to find actual tensors and ignore Axon.None values
+    embedding_tensor =
+      cond do
+        Map.has_key?(outputs, :logits) and match?(%Nx.Tensor{}, outputs.logits) ->
+          # For sentence transformers, we use the logits and do mean pooling
+          outputs.logits
+          # Mean pool across sequence length
+          |> Nx.mean(axes: [1])
+          # Remove batch dimension
+          |> Nx.squeeze(axes: [0])
 
-        relevant_docs_with_scores
-        |> Enum.with_index(1)
-        |> Enum.each(fn {{chunk, score}, index} ->
-          preview = String.slice(chunk, 0, 100) <> "..."
-          IO.puts("#{index}. (Score: #{Float.round(score, 3)}) #{preview}")
-          IO.puts(String.duplicate("-", 50))
-        end)
+        Map.has_key?(outputs, :hidden_states) and match?(%Nx.Tensor{}, outputs.hidden_states) ->
+          # Some models use hidden_states (plural) - but only if it's a tensor
+          outputs.hidden_states
+          |> Nx.mean(axes: [1])
+          |> Nx.squeeze(axes: [0])
 
-        response = generate_ai_response(rag_system, query, relevant_docs_with_scores)
-        IO.puts("\n💬 Response:\n#{response}")
+        Map.has_key?(outputs, :hidden_state) and match?(%Nx.Tensor{}, outputs.hidden_state) ->
+          # Some models use hidden_state (singular) - but only if it's a tensor
+          outputs.hidden_state
+          |> Nx.mean(axes: [1])
+          |> Nx.squeeze(axes: [0])
 
-        interactive_loop(rag_system)
-    end
+        true ->
+          # Fallback: find the first actual tensor in outputs (ignore Axon.None values)
+          actual_tensor =
+            outputs
+            |> Map.values()
+            |> Enum.find(&match?(%Nx.Tensor{}, &1))
+
+          case actual_tensor do
+            nil ->
+              IO.puts("Available outputs: #{inspect(Map.keys(outputs))}")
+
+              outputs
+              |> Map.to_list()
+              |> Enum.each(fn {k, v} ->
+                IO.puts("#{k}: #{inspect(v, structs: false, limit: 2)}")
+              end)
+
+              raise "No tensor found in model outputs: #{inspect(Map.keys(outputs))}"
+
+            tensor ->
+              tensor
+              |> Nx.mean(axes: [1])
+              |> Nx.squeeze(axes: [0])
+          end
+      end
+
+    embedding_tensor
   end
 end
