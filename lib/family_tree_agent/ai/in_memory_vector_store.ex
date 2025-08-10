@@ -4,6 +4,11 @@ defmodule FamilyTreeAgent.AI.InMemoryVectorStore do
   This avoids the complexity of external dependencies while providing working RAG functionality.
   """
 
+  @type t :: %__MODULE__{
+          documents: list(String.t()),
+          embeddings: Nx.Tensor.t()
+        }
+
   defstruct [:documents, :embeddings]
 
   @doc """

@@ -1,12 +1,10 @@
 defmodule FamilyTreeAgent.AI.FileProcessor do
   @chunk_size 200
   @chunk_overlap 20
-  @context_file_path Path.join([__DIR__, "context.json"])
+  @context_file_path Path.join([:code.priv_dir(:family_tree_agent), "family_data", "context.txt"])
 
-  @doc """
-  Load documents from the context file.
-  """
-  def load_documents(file_path \\ @context_file_path) do
+  @spec load_documents!(String.t()) :: list(String.t())
+  def load_documents!(file_path \\ @context_file_path) do
     case File.read(file_path) do
       {:ok, content} ->
         case Jason.decode(content) do
@@ -24,9 +22,7 @@ defmodule FamilyTreeAgent.AI.FileProcessor do
     end
   end
 
-  @doc """
-  Split documents into smaller chunks for processing.
-  """
+  @spec split_documents(list(String.t())) :: list(String.t())
   def split_documents(documents) do
     Enum.flat_map(documents, fn doc ->
       split_text_into_chunks(doc, @chunk_size, @chunk_overlap)
