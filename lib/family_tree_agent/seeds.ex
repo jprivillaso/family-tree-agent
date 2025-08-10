@@ -84,7 +84,7 @@ defmodule FamilyTreeAgent.Seeds do
       {:ok, member} ->
         IO.puts("✓ Created: #{member.name} (ID: #{member.id})")
 
-      {:error, changeset} ->
+      {:error, _changeset} ->
         IO.puts("✗ Failed to create member: #{member_data["name"]}")
     end
   end
@@ -107,7 +107,7 @@ defmodule FamilyTreeAgent.Seeds do
       {:ok, member} ->
         IO.puts("✓ Created sample member: #{member.name} (ID: #{member.id})")
 
-      {:error, changeset} ->
+      {:error, _changeset} ->
       IO.puts("✗ Failed to create sample member")
     end
   end
