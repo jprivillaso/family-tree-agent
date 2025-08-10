@@ -45,7 +45,8 @@ defmodule FamilyTreeRAG do
 
     IO.puts("Creating embeddings for #{length(chunks)} chunks...")
 
-    documents_with_embeddings = create_embeddings_for_chunks(chunks, embedding_model, embedding_tokenizer)
+    documents_with_embeddings =
+      create_embeddings_for_chunks(chunks, embedding_model, embedding_tokenizer)
 
     IO.puts("Building vector store...")
     vector_store = SimpleVectorStore.new(documents_with_embeddings)
@@ -67,19 +68,13 @@ defmodule FamilyTreeRAG do
 
     try do
       {:ok, chat_model} =
-        Bumblebee.load_model(
-          {:hf, @chat_model_repo, auth_token: huggingface_token}
-        )
+        Bumblebee.load_model({:hf, @chat_model_repo, auth_token: huggingface_token})
 
       {:ok, chat_tokenizer} =
-        Bumblebee.load_tokenizer(
-          {:hf, @chat_model_repo, auth_token: huggingface_token}
-        )
+        Bumblebee.load_tokenizer({:hf, @chat_model_repo, auth_token: huggingface_token})
 
       {:ok, generation_config} =
-        Bumblebee.load_generation_config(
-          {:hf, @chat_model_repo, auth_token: huggingface_token}
-        )
+        Bumblebee.load_generation_config({:hf, @chat_model_repo, auth_token: huggingface_token})
 
       # Configure generation parameters - focused responses
       generation_config =
@@ -239,7 +234,9 @@ defmodule FamilyTreeRAG do
   Perform similarity search to find relevant documents.
   """
   def similarity_search(rag_system, query, k \\ 3) do
-    query_embedding = create_embedding(query, rag_system.embedding_model, rag_system.embedding_tokenizer)
+    query_embedding =
+      create_embedding(query, rag_system.embedding_model, rag_system.embedding_tokenizer)
+
     SimpleVectorStore.similarity_search(rag_system.vector_store, query_embedding, k)
   end
 
