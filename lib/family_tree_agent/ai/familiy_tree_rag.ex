@@ -11,6 +11,15 @@ defmodule FamilyTreeRAG do
   @embedding_model_repo "sentence-transformers/all-MiniLM-L6-v2"
   @chat_model_repo "google/gemma-2b"
 
+  @type t :: %__MODULE__{
+          embedding_model: Bumblebee.Model.t(),
+          embedding_tokenizer: Bumblebee.Tokenizer.t(),
+          chat_model: Bumblebee.Model.t(),
+          chat_tokenizer: Bumblebee.Tokenizer.t(),
+          generation_config: Bumblebee.GenerationConfig.t(),
+          vector_store: InMemoryVectorStore.t()
+        }
+
   defstruct [
     :embedding_model,
     :embedding_tokenizer,
@@ -20,58 +29,62 @@ defmodule FamilyTreeRAG do
     :vector_store
   ]
 
-  def huggingface_token do
+  defp huggingface_token do
     Application.fetch_env!(:family_tree_agent, :huggingface_token)
   end
 
   @doc """
   Main function to run the RAG system interactively.
   """
-  def run do
-    rag_system = init()
+  def run! do
+    case init() do
+      %__MODULE__{} = rag_system ->
+        IO.puts("\n✅ RAG System initialized successfully!")
+        IO.puts("💡 Try questions like:")
+        IO.puts("   - 'Tell me about Jane Doe'")
+        IO.puts("   - 'What are Alice's hobbies?'")
+        IO.puts("   - 'Who is married to John Doe?'")
 
-    IO.puts("\n✅ RAG System initialized successfully!")
-    IO.puts("💡 Try questions like:")
-    IO.puts("   - 'Tell me about Jane Doe'")
-    IO.puts("   - 'What are Alice's hobbies?'")
-    IO.puts("   - 'Who is married to John Doe?'")
+        interactive_loop(rag_system)
 
-    interactive_loop(rag_system)
+      {:error, error} ->
+        IO.puts("Error initializing RAG system: #{inspect(error)}")
+        raise error
+    end
   end
 
   defp init do
     # Set EXLA as the default backend for better performance
     Nx.global_default_backend(EXLA.Backend)
 
-    IO.puts("Loading embedding model and tokenizer...")
-    {:ok, embedding_model} = Bumblebee.load_model({:hf, @embedding_model_repo})
-    {:ok, embedding_tokenizer} = Bumblebee.load_tokenizer({:hf, @embedding_model_repo})
+    with {:ok, embedding_model} <- Bumblebee.load_model({:hf, @embedding_model_repo}),
+         {:ok, embedding_tokenizer} <- Bumblebee.load_tokenizer({:hf, @embedding_model_repo}),
+         {:ok, chat_model, chat_tokenizer, generation_config} <- load_chat_model() do
+      IO.puts("Loading and processing documents...")
+      documents = FileProcessor.load_documents!()
+      chunks = FileProcessor.split_documents(documents)
 
-    {chat_model, chat_tokenizer, generation_config} = load_chat_model!()
+      IO.puts("Creating embeddings for #{length(chunks)} chunks...")
 
-    IO.puts("Loading and processing documents...")
-    documents = FileProcessor.load_documents()
-    chunks = FileProcessor.split_documents(documents)
+      documents_with_embeddings =
+        create_embeddings_for_chunks(chunks, embedding_model, embedding_tokenizer)
 
-    IO.puts("Creating embeddings for #{length(chunks)} chunks...")
+      IO.puts("Building vector store...")
+      vector_store = InMemoryVectorStore.new(documents_with_embeddings)
 
-    documents_with_embeddings =
-      create_embeddings_for_chunks(chunks, embedding_model, embedding_tokenizer)
-
-    IO.puts("Building vector store...")
-    vector_store = InMemoryVectorStore.new(documents_with_embeddings)
-
-    %__MODULE__{
-      embedding_model: embedding_model,
-      embedding_tokenizer: embedding_tokenizer,
-      chat_model: chat_model,
-      chat_tokenizer: chat_tokenizer,
-      generation_config: generation_config,
-      vector_store: vector_store
-    }
+      %__MODULE__{
+        embedding_model: embedding_model,
+        embedding_tokenizer: embedding_tokenizer,
+        chat_model: chat_model,
+        chat_tokenizer: chat_tokenizer,
+        generation_config: generation_config,
+        vector_store: vector_store
+      }
+    end
   end
 
-  defp interactive_loop(rag_system) do
+  @spec interactive_loop(t()) :: :ok
+  def interactive_loop(rag_system) do
     query = IO.gets("\nEnter your query (or 'exit' to exit): ") |> String.trim()
 
     case query do
@@ -89,8 +102,7 @@ defmodule FamilyTreeRAG do
         relevant_docs_with_scores =
           Enum.reject(relevant_docs_with_scores, fn {_doc, score} -> score < 0.05 end)
 
-        IO.puts("\n📄 Top 3 most relevant documents:")
-        IO.puts(relevant_docs_with_scores)
+        IO.puts("\n📄 Top most relevant documents:")
 
         relevant_docs_with_scores
         |> Enum.with_index(1)
@@ -107,37 +119,31 @@ defmodule FamilyTreeRAG do
     end
   end
 
-  defp load_chat_model! do
+  defp load_chat_model do
     IO.puts("Attempting to load chat model...")
 
     huggingface_token = huggingface_token()
 
-    try do
-      {:ok, chat_model} =
-        Bumblebee.load_model({:hf, @chat_model_repo, auth_token: huggingface_token})
+    {:ok, chat_model} =
+      Bumblebee.load_model({:hf, @chat_model_repo, auth_token: huggingface_token})
 
-      {:ok, chat_tokenizer} =
-        Bumblebee.load_tokenizer({:hf, @chat_model_repo, auth_token: huggingface_token})
+    {:ok, chat_tokenizer} =
+      Bumblebee.load_tokenizer({:hf, @chat_model_repo, auth_token: huggingface_token})
 
-      {:ok, generation_config} =
-        Bumblebee.load_generation_config({:hf, @chat_model_repo, auth_token: huggingface_token})
+    {:ok, generation_config} =
+      Bumblebee.load_generation_config({:hf, @chat_model_repo, auth_token: huggingface_token})
 
-      # Configure generation parameters - focused responses
-      generation_config =
-        Bumblebee.configure(generation_config,
-          # Very short to force concise answers
-          max_new_tokens: 30,
-          # Low temperature for more focused, deterministic responses
-          temperature: 0.1
-        )
+    # Configure generation parameters - focused responses
+    generation_config =
+      Bumblebee.configure(generation_config,
+        # Very short to force concise answers
+        max_new_tokens: 30,
+        # Low temperature for more focused, deterministic responses
+        temperature: 0.1
+      )
 
-      IO.puts("✅ Chat model loaded successfully!")
-      {chat_model, chat_tokenizer, generation_config}
-    rescue
-      error ->
-        IO.puts("⚠️ Chat model loading failed: #{inspect(error)}")
-        raise error
-    end
+    IO.puts("✅ Chat model loaded successfully!")
+    {:ok, chat_model, chat_tokenizer, generation_config}
   end
 
   defp generate_ai_response(rag_system, query, relevant_docs_with_scores) do
@@ -250,54 +256,51 @@ defmodule FamilyTreeRAG do
     # Handle the sentence-transformers model output format
     # The model returns: %{hidden_states: #Axon.None<...>, attentions: #Axon.None<...>, logits: #Nx.Tensor<...>}
     # We need to find actual tensors and ignore Axon.None values
-    embedding_tensor =
-      cond do
-        Map.has_key?(outputs, :logits) and match?(%Nx.Tensor{}, outputs.logits) ->
-          # For sentence transformers, we use the logits and do mean pooling
-          outputs.logits
-          # Mean pool across sequence length
-          |> Nx.mean(axes: [1])
-          # Remove batch dimension
-          |> Nx.squeeze(axes: [0])
+    cond do
+      Map.has_key?(outputs, :logits) and match?(%Nx.Tensor{}, outputs.logits) ->
+        # For sentence transformers, we use the logits and do mean pooling
+        outputs.logits
+        # Mean pool across sequence length
+        |> Nx.mean(axes: [1])
+        # Remove batch dimension
+        |> Nx.squeeze(axes: [0])
 
-        Map.has_key?(outputs, :hidden_states) and match?(%Nx.Tensor{}, outputs.hidden_states) ->
-          # Some models use hidden_states (plural) - but only if it's a tensor
-          outputs.hidden_states
-          |> Nx.mean(axes: [1])
-          |> Nx.squeeze(axes: [0])
+      Map.has_key?(outputs, :hidden_states) and match?(%Nx.Tensor{}, outputs.hidden_states) ->
+        # Some models use hidden_states (plural) - but only if it's a tensor
+        outputs.hidden_states
+        |> Nx.mean(axes: [1])
+        |> Nx.squeeze(axes: [0])
 
-        Map.has_key?(outputs, :hidden_state) and match?(%Nx.Tensor{}, outputs.hidden_state) ->
-          # Some models use hidden_state (singular) - but only if it's a tensor
-          outputs.hidden_state
-          |> Nx.mean(axes: [1])
-          |> Nx.squeeze(axes: [0])
+      Map.has_key?(outputs, :hidden_state) and match?(%Nx.Tensor{}, outputs.hidden_state) ->
+        # Some models use hidden_state (singular) - but only if it's a tensor
+        outputs.hidden_state
+        |> Nx.mean(axes: [1])
+        |> Nx.squeeze(axes: [0])
 
-        true ->
-          # Fallback: find the first actual tensor in outputs (ignore Axon.None values)
-          actual_tensor =
+      true ->
+        # Fallback: find the first actual tensor in outputs (ignore Axon.None values)
+        actual_tensor =
+          outputs
+          |> Map.values()
+          |> Enum.find(&match?(%Nx.Tensor{}, &1))
+
+        case actual_tensor do
+          nil ->
+            IO.puts("Available outputs: #{inspect(Map.keys(outputs))}")
+
             outputs
-            |> Map.values()
-            |> Enum.find(&match?(%Nx.Tensor{}, &1))
+            |> Map.to_list()
+            |> Enum.each(fn {k, v} ->
+              IO.puts("#{k}: #{inspect(v, structs: false, limit: 2)}")
+            end)
 
-          case actual_tensor do
-            nil ->
-              IO.puts("Available outputs: #{inspect(Map.keys(outputs))}")
+            raise "No tensor found in model outputs: #{inspect(Map.keys(outputs))}"
 
-              outputs
-              |> Map.to_list()
-              |> Enum.each(fn {k, v} ->
-                IO.puts("#{k}: #{inspect(v, structs: false, limit: 2)}")
-              end)
-
-              raise "No tensor found in model outputs: #{inspect(Map.keys(outputs))}"
-
-            tensor ->
-              tensor
-              |> Nx.mean(axes: [1])
-              |> Nx.squeeze(axes: [0])
-          end
-      end
-
-    embedding_tensor
+          tensor ->
+            tensor
+            |> Nx.mean(axes: [1])
+            |> Nx.squeeze(axes: [0])
+        end
+    end
   end
 end

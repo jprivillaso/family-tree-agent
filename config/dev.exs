@@ -86,3 +86,8 @@ config :swoosh, :api_client, false
 
 # OpenAI configuration
 config :family_tree_agent, :openai, api_key: System.get_env("OPENAI_API_KEY")
+
+# Import secret configuration (if it exists)
+if File.exists?("config/dev_secret.exs") do
+  import_config "./dev_secret.exs"
+end
