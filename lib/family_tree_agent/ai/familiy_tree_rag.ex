@@ -12,11 +12,11 @@ defmodule FamilyTreeRAG do
   @chat_model_repo "google/gemma-2b"
 
   @type t :: %__MODULE__{
-          embedding_model: Bumblebee.Model.t(),
-          embedding_tokenizer: Bumblebee.Tokenizer.t(),
-          chat_model: Bumblebee.Model.t(),
-          chat_tokenizer: Bumblebee.Tokenizer.t(),
-          generation_config: Bumblebee.GenerationConfig.t(),
+          embedding_model: any(),
+          embedding_tokenizer: any(),
+          chat_model: any(),
+          chat_tokenizer: any(),
+          generation_config: any(),
           vector_store: InMemoryVectorStore.t()
         }
 
@@ -85,7 +85,7 @@ defmodule FamilyTreeRAG do
 
   @spec interactive_loop(t()) :: :ok
   def interactive_loop(rag_system) do
-    query = IO.gets("\nEnter your query (or 'exit' to exit): ") |> String.trim()
+    query = IO.gets("\nEnter your query (or 'exit' to exit):")
 
     case query do
       "exit" ->

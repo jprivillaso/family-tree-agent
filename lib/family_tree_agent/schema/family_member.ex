@@ -1,4 +1,11 @@
 defmodule FamilyTreeAgent.Schema.FamilyMember do
+  @moduledoc """
+  Schema for family members in the family tree.
+
+  Represents a person in the family with their basic information,
+  relationships to other family members, and additional metadata.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 
