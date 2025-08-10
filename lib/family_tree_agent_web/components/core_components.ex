@@ -17,7 +17,8 @@ defmodule FamilyTreeAgentWeb.CoreComponents do
   use Phoenix.Component
   use Gettext, backend: FamilyTreeAgentWeb.Gettext
 
-  alias Form
+  alias Phoenix.HTML.Form
+  alias Phoenix.HTML.FormField
   alias Phoenix.LiveView.JS
 
   @doc """

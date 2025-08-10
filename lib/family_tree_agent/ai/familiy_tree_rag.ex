@@ -119,6 +119,16 @@ defmodule FamilyTreeRAG do
     end
   end
 
+  @spec one_shot(t(), String.t()) :: String.t() | {:error, String.t()}
+  def one_shot(rag_system, query) do
+    relevant_docs_with_scores = similarity_search(rag_system, query, 3)
+
+    relevant_docs_with_scores =
+      Enum.reject(relevant_docs_with_scores, fn {_doc, score} -> score < 0.05 end)
+
+    generate_ai_response(rag_system, query, relevant_docs_with_scores)
+  end
+
   defp load_chat_model do
     IO.puts("Attempting to load chat model...")
 
