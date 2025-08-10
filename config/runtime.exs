@@ -20,6 +20,11 @@ if System.get_env("PHX_SERVER") do
   config :family_tree_agent, FamilyTreeAgentWeb.Endpoint, server: true
 end
 
+# OpenAI configuration for all environments
+if System.get_env("OPENAI_API_KEY") do
+  config :family_tree_agent, :openai, api_key: System.get_env("OPENAI_API_KEY")
+end
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -64,6 +69,9 @@ if config_env() == :prod do
       port: port
     ],
     secret_key_base: secret_key_base
+
+  # OpenAI configuration
+  config :family_tree_agent, :openai, api_key: System.get_env("OPENAI_API_KEY")
 
   # ## SSL Support
   #

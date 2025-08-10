@@ -1,4 +1,4 @@
-defmodule FamilyTreeAgent.FamilyTree do
+defmodule FamilyTreeAgent.Data.FamilyTree do
   @moduledoc """
   Context module for managing family tree data and operations using the database.
   """
@@ -151,9 +151,10 @@ defmodule FamilyTreeAgent.FamilyTree do
 
   """
   def search_members_by_name(name) do
-    query = from m in FamilyMember,
-            where: ilike(m.name, ^"%#{name}%"),
-            order_by: m.name
+    query =
+      from m in FamilyMember,
+        where: ilike(m.name, ^"%#{name}%"),
+        order_by: m.name
 
     Repo.all(query)
   end

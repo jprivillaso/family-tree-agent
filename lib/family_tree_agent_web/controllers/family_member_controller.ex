@@ -1,8 +1,9 @@
 defmodule FamilyTreeAgentWeb.FamilyMemberController do
   use FamilyTreeAgentWeb, :controller
 
-  alias FamilyTreeAgent.FamilyTree
+  alias FamilyTreeAgent.Data.FamilyTree
   alias FamilyTreeAgent.Schema.FamilyMember
+  alias FamilyTreeAgent.Agents.Agent
 
   action_fallback FamilyTreeAgentWeb.FallbackController
 
@@ -163,6 +164,68 @@ defmodule FamilyTreeAgentWeb.FamilyMemberController do
           error: %{
             message: "Family member not found",
             details: "No member found with ID: #{id}"
+          }
+        })
+    end
+  end
+
+  @doc """
+  POST /api/family_members/answer
+  Answers questions about a specific family member using AI.
+  """
+  def answer(conn, %{"person_name" => person_name, "question" => question}) do
+    case Agent.answer_question(person_name, question) do
+      {:ok, answer} ->
+        conn
+        |> put_status(:ok)
+        |> json(%{
+          success: true,
+          data: %{
+            person_name: person_name,
+            question: question,
+            answer: answer
+          }
+        })
+
+      {:error, error_message} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{
+          success: false,
+          error: %{
+            message: error_message,
+            person_name: person_name,
+            question: question
+          }
+        })
+    end
+  end
+
+  @doc """
+  POST /api/family_members/answer_general
+  Answers general questions about the family tree using AI.
+  """
+  def answer_general(conn, %{"question" => question}) do
+    case Agent.answer_general_question(question) do
+      {:ok, answer} ->
+        conn
+        |> put_status(:ok)
+        |> json(%{
+          success: true,
+          data: %{
+            question: question,
+            answer: answer
+          }
+        })
+
+      {:error, error_message} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{
+          success: false,
+          error: %{
+            message: error_message,
+            question: question
           }
         })
     end
