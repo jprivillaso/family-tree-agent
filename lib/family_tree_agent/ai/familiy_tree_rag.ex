@@ -164,7 +164,8 @@ defmodule FamilyTreeRAG do
   def create_embeddings_for_chunks(chunks, model, tokenizer) do
     IO.puts("Processing embeddings for #{length(chunks)} chunks...")
 
-    Enum.with_index(chunks)
+    chunks
+    |> Enum.with_index()
     |> Enum.map(fn {chunk, idx} ->
       IO.puts("Processing chunk #{idx + 1}/#{length(chunks)}")
 
@@ -238,9 +239,7 @@ defmodule FamilyTreeRAG do
   Perform similarity search to find relevant documents.
   """
   def similarity_search(rag_system, query, k \\ 3) do
-    query_embedding =
-      create_embedding(query, rag_system.embedding_model, rag_system.embedding_tokenizer)
-
+    query_embedding = create_embedding(query, rag_system.embedding_model, rag_system.embedding_tokenizer)
     SimpleVectorStore.similarity_search(rag_system.vector_store, query_embedding, k)
   end
 
@@ -313,19 +312,14 @@ defmodule FamilyTreeRAG do
       case result do
         %{results: [%{text: generated_text}]} ->
           cleaned_text = String.trim(generated_text)
-          IO.puts("📝 Generated text length: #{String.length(cleaned_text)}")
           "🤖 AI Response: #{cleaned_text}."
 
         other ->
-          IO.puts("⚠️  Unexpected result format: #{inspect(other)}")
-          IO.puts("⚠️  Text generation failed, using structured response")
-          {:error, "Text generation failed"}
+          {:error, "Text generation failed: #{inspect(other)}"}
       end
     rescue
       error ->
-        IO.puts("⚠️  Error during text generation: #{inspect(error)}")
-        IO.puts("📝 Falling back to structured response...")
-        {:error, "Text generation failed"}
+        {:error, "Text generation failed: #{inspect(error)}"}
     end
   end
 
