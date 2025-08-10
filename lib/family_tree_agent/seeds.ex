@@ -108,7 +108,7 @@ defmodule FamilyTreeAgent.Seeds do
         IO.puts("✓ Created sample member: #{member.name} (ID: #{member.id})")
 
       {:error, _changeset} ->
-      IO.puts("✗ Failed to create sample member")
+        IO.puts("✗ Failed to create sample member")
     end
   end
 
