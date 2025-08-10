@@ -63,7 +63,9 @@ defmodule FamilyTreeAgent.MixProject do
       {:nx, "~> 0.9.0"},
       {:exla, "~> 0.9.0"},
       {:jason, "~> 1.4"},
-      {:req, "~> 0.5.0"}
+      {:req, "~> 0.5.0"},
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -79,6 +81,8 @@ defmodule FamilyTreeAgent.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      quality: ["format", "credo --strict", "dialyzer"],
+      lint: ["format --check-formatted", "credo"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind family_tree_agent", "esbuild family_tree_agent"],
       "assets.deploy": [

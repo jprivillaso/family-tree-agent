@@ -170,7 +170,7 @@ defmodule FamilyTreeAgent.Agents.Agent do
   end
 
   defp format_family_members(members) do
-    Enum.map(members, fn member ->
+    Enum.map_join(members, "\n", fn member ->
       """
       - #{member.name} (#{member.birth_date || "unknown"} - #{member.death_date || "present"})
         Bio: #{member.bio || "No bio available"}
@@ -178,12 +178,10 @@ defmodule FamilyTreeAgent.Agents.Agent do
         Additional: #{format_metadata(member.metadata)}
       """
     end)
-    |> Enum.join("\n")
   end
 
   defp format_relationships(relationships) when is_map(relationships) do
-    relationships
-    |> Enum.map(fn {key, value} ->
+    Enum.map_join(relationships, ", ", fn {key, value} ->
       case value do
         list when is_list(list) ->
           "#{key}: #{Enum.join(list, ", ")}"
@@ -195,14 +193,12 @@ defmodule FamilyTreeAgent.Agents.Agent do
           "#{key}: #{inspect(value)}"
       end
     end)
-    |> Enum.join(", ")
   end
 
   defp format_relationships(_), do: "No relationships recorded"
 
   defp format_metadata(metadata) when is_map(metadata) do
-    metadata
-    |> Enum.map(fn {key, value} ->
+    Enum.map_join(metadata, ", ", fn {key, value} ->
       case value do
         list when is_list(list) ->
           "#{key}: #{Enum.join(list, ", ")}"
@@ -211,7 +207,6 @@ defmodule FamilyTreeAgent.Agents.Agent do
           "#{key}: #{single}"
       end
     end)
-    |> Enum.join(", ")
   end
 
   defp format_metadata(_), do: "No additional information available"

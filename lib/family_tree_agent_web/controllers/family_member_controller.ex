@@ -1,9 +1,9 @@
 defmodule FamilyTreeAgentWeb.FamilyMemberController do
   use FamilyTreeAgentWeb, :controller
 
+  alias FamilyTreeAgent.Agents.Agent
   alias FamilyTreeAgent.Data.FamilyTree
   alias FamilyTreeAgent.Schema.FamilyMember
-  alias FamilyTreeAgent.Agents.Agent
 
   action_fallback FamilyTreeAgentWeb.FallbackController
 
