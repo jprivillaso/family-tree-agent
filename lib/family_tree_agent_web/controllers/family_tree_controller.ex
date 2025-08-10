@@ -1,7 +1,7 @@
 defmodule FamilyTreeAgentWeb.FamilyTreeController do
   use FamilyTreeAgentWeb, :controller
 
-  alias FamilyTreeAgent.FamilyTree
+  alias FamilyTreeAgent.Data.FamilyTree
 
   action_fallback FamilyTreeAgentWeb.FallbackController
 
