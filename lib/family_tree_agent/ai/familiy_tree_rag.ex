@@ -1,4 +1,4 @@
-defmodule FamilyTreeRAG do
+defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
   @moduledoc """
   This module demonstrates RAG (Retrieval-Augmented Generation) using Elixir, Bumblebee, and Nx.
   This version includes both retrieval and natural language generation capabilities.
@@ -53,7 +53,7 @@ defmodule FamilyTreeRAG do
     end
   end
 
-  defp init do
+  def init do
     # Set EXLA as the default backend for better performance
     Nx.global_default_backend(EXLA.Backend)
 

@@ -24,6 +24,9 @@ defmodule FamilyTreeAgentWeb.Router do
   scope "/api", FamilyTreeAgentWeb do
     pipe_through :api
 
+    # Health check endpoint
+    get "/health", HealthController, :health
+
     resources "/family_members", FamilyMemberController, except: [:new, :edit]
     get "/family_tree", FamilyTreeController, :show
 

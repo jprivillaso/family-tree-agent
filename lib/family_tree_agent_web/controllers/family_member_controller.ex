@@ -1,7 +1,7 @@
 defmodule FamilyTreeAgentWeb.FamilyMemberController do
   use FamilyTreeAgentWeb, :controller
 
-  alias FamilyTreeAgent.Agents.Agent
+  alias FamilyTreeAgent.AI.RAGServer
   alias FamilyTreeAgent.Data.FamilyTree
   alias FamilyTreeAgent.Schema.FamilyMember
 
@@ -169,31 +169,35 @@ defmodule FamilyTreeAgentWeb.FamilyMemberController do
     end
   end
 
+  @spec answer(Plug.Conn.t(), map()) :: Plug.Conn.t()
   @doc """
   POST /api/family_members/answer
   Answers questions about a specific family member using AI.
   """
   def answer(conn, %{"person_name" => person_name, "question" => question}) do
-    case Agent.answer_question(person_name, question) do
-      {:ok, answer} ->
-        conn
-        |> put_status(:ok)
-        |> json(%{
-          success: true,
-          data: %{
-            person_name: person_name,
-            question: question,
-            answer: answer
-          }
-        })
+    full_question = "Tell me about #{person_name}: #{question}"
 
-      {:error, error_message} ->
+    try do
+      answer = RAGServer.answer_question(full_question)
+
+      conn
+      |> put_status(:ok)
+      |> json(%{
+        success: true,
+        data: %{
+          person_name: person_name,
+          question: question,
+          answer: answer
+        }
+      })
+    rescue
+      error ->
         conn
-        |> put_status(:bad_request)
+        |> put_status(:internal_server_error)
         |> json(%{
           success: false,
           error: %{
-            message: error_message,
+            message: "Failed to generate answer: #{Exception.message(error)}",
             person_name: person_name,
             question: question
           }
@@ -201,30 +205,32 @@ defmodule FamilyTreeAgentWeb.FamilyMemberController do
     end
   end
 
+  @spec answer_general(Plug.Conn.t(), map()) :: Plug.Conn.t()
   @doc """
   POST /api/family_members/answer_general
   Answers general questions about the family tree using AI.
   """
   def answer_general(conn, %{"question" => question}) do
-    case Agent.answer_general_question(question) do
-      {:ok, answer} ->
-        conn
-        |> put_status(:ok)
-        |> json(%{
-          success: true,
-          data: %{
-            question: question,
-            answer: answer
-          }
-        })
+    try do
+      answer = RAGServer.answer_question(question)
 
-      {:error, error_message} ->
+      conn
+      |> put_status(:ok)
+      |> json(%{
+        success: true,
+        data: %{
+          question: question,
+          answer: answer
+        }
+      })
+    rescue
+      error ->
         conn
-        |> put_status(:bad_request)
+        |> put_status(:internal_server_error)
         |> json(%{
           success: false,
           error: %{
-            message: error_message,
+            message: "Failed to generate answer: #{Exception.message(error)}",
             question: question
           }
         })

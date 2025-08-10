@@ -14,6 +14,8 @@ defmodule FamilyTreeAgent.Application do
       {Phoenix.PubSub, name: FamilyTreeAgent.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: FamilyTreeAgent.Finch},
+      # Start the RAG supervisor for AI queries (won't crash app if RAG fails)
+      FamilyTreeAgent.AI.RAGSupervisor,
       # Start a worker by calling: FamilyTreeAgent.Worker.start_link(arg)
       # {FamilyTreeAgent.Worker, arg},
       # Start to serve requests, typically the last entry
