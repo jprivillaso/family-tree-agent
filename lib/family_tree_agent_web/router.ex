@@ -14,12 +14,6 @@ defmodule FamilyTreeAgentWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", FamilyTreeAgentWeb do
-    pipe_through :browser
-
-    get "/", PageController, :home
-  end
-
   # Other scopes may use custom stacks.
   scope "/api", FamilyTreeAgentWeb do
     pipe_through :api

@@ -64,6 +64,7 @@ defmodule FamilyTreeAgent.MixProject do
       {:exla, "~> 0.9.0"},
       {:jason, "~> 1.4"},
       {:req, "~> 0.5.0"},
+      {:text_chunker, "~> 0.4.0"},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
