@@ -61,8 +61,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
          {:ok, embedding_tokenizer} <- Bumblebee.load_tokenizer({:hf, @embedding_model_repo}),
          {:ok, chat_model, chat_tokenizer, generation_config} <- load_chat_model() do
       IO.puts("Loading and processing documents...")
-      documents = FileProcessor.load_documents!()
-      chunks = FileProcessor.split_documents(documents)
+      chunks = FileProcessor.load_documents!()
 
       IO.puts("Creating embeddings for #{length(chunks)} chunks...")
 
