@@ -1,66 +1,112 @@
 {
   "family_members": [
     {
-      "id": "550e8400-e29b-41d4-a716-446655440001",
-      "name": "John Doe",
-      "birth_date": "1980-01-15",
+      "name": "Juan Pablo Rivillas Ospina",
+      "birth_date": "1991-11-18",
       "death_date": null,
-      "bio": "Sample family member for testing the database setup.",
+      "bio": "Loves to travel with his family, learn about new technologies and write in his blog. He's originally from Colombia but moved to Brazil in 2013. After that, has has lived in the United States for a year and today he spends most of the time with his family in their beach house in Sao Miguel dos Milagres. Coffee lover, tail teller and a very empathetic person. His family is his everything.",
       "relationships": {
-        "spouse": "Jane Doe",
-        "children": ["Alice Doe", "Bob Doe"],
-        "parents": ["Robert Doe", "Mary Doe"]
+        "spouse": "Alessandra Magalhes de Souza Lima",
+        "children": ["Joao Rivillas de Magalhaes", "David Rivillas de Magalhaes"],
+        "parents": ["Rolsalba del Consuelo Ospina Montoya", "Tulio Mario Rivillas Zapata"]
       },
       "metadata": {
         "occupation": "Software Engineer",
-        "location": "San Francisco, CA"
+        "location": "Belo Horizonte, Brazil"
       }
     },
     {
-      "id": "550e8400-e29b-41d4-a716-446655440002",
-      "name": "Jane Doe",
-      "birth_date": "1982-05-22",
+      "name": "Alessandra Magalhes de Souza Lima",
+      "birth_date": "1985-12-05",
       "death_date": null,
-      "bio": "Loving wife and mother, works as a teacher.",
+      "bio": "Passionate mother. Loves to spend time with her family, traveling and discovering new places in the nature. She's a natural dreamer. What she visions, she makes happen. Dedicated mother and wife. A woman that conquers anybody's heart with her smile, kindness and contagious laugh.",
       "relationships": {
-        "spouse": "John Doe",
-        "children": ["Alice Doe", "Bob Doe"],
-        "parents": ["William Smith", "Susan Smith"]
+        "spouse": "Juan Pablo Rivillas Ospina",
+        "children": ["Joao Rivillas de Magalhaes", "David Rivillas de Magalhaes"],
+        "parents": ["Cleolice Magalhaes de Souza Lima", "Evaldo de Souza Lima"]
       },
       "metadata": {
-        "occupation": "Teacher",
-        "location": "San Francisco, CA"
+        "occupation": "Lawyer",
+        "location": "Belo Horizonte, Brazil"
       }
     },
     {
-      "id": "550e8400-e29b-41d4-a716-446655440003",
-      "name": "Alice Doe",
-      "birth_date": "2010-03-10",
+      "name": "Joao Rivillas de Magalhaes",
+      "birth_date": "2021-06-11",
       "death_date": null,
-      "bio": "Bright young student who loves reading and mathematics.",
+      "bio": "A very curious child. Loves to ride his bike with his brother David, go to the beach to grab crabs and travel with his family. The world is his home.",
       "relationships": {
-        "parents": ["John Doe", "Jane Doe"],
-        "siblings": ["Bob Doe"]
+        "parents": ["Juan Pablo Rivillas Ospina", "Alessandra Magalhes de Souza Lima"]
       },
       "metadata": {
-        "school": "Elementary School",
-        "hobbies": ["reading", "mathematics", "piano"]
+        "occupation": "None",
+        "location": "Belo Horizonte, Brazil"
       }
     },
     {
-      "id": "550e8400-e29b-41d4-a716-446655440004",
-      "name": "Bob Doe",
-      "birth_date": "2012-07-18",
+      "name": "David Rivillas de Magalhaes",
+      "birth_date": "2022-07-22",
       "death_date": null,
-      "bio": "Energetic kid who enjoys sports and video games.",
+      "bio": "Funniest child. Loves to ride his bike with his brother Joao, go to the beach to grab crabs. He loves animals and loves any adventure with his brother. He's very smart and loves to explore the nature, ask questions and look at the sky.",
       "relationships": {
-        "parents": ["John Doe", "Jane Doe"],
-        "siblings": ["Alice Doe"]
+        "parents": ["Juan Pablo Rivillas Ospina", "Alessandra Magalhes de Souza Lima"]
       },
       "metadata": {
-        "school": "Elementary School",
-        "hobbies": ["soccer", "video games", "drawing"]
+        "occupation": "None",
+        "location": "Belo Horizonte, Brazil"
+      }
+    },
+    {
+      "name": "Rolsalba del Consuelo Ospina Montoya",
+      "birth_date": "1956-07-24",
+      "death_date": null,
+      "bio": "Dedicated mother and daughter. Strong woman who raised three boys on her own for many years. Loves a crossword puzzle, reading the three musketeers and enjoying a cup of coffee in the morning.",
+      "relationships": {
+        "children": ["Juan Pablo Rivillas Ospina", "Alessandra Magalhes de Souza Lima"]
+      },
+      "metadata": {
+        "occupation": "None",
+        "location": "Rionegro, Antioquia, Colombia"
+      }
+    },
+    {
+      "name": "Tulio Mario Rivillas Zapata",
+      "birth_date": "1953-02-03",
+      "death_date": null,
+      "bio": "Thing of a tough, hardworking person. Dedicated his life to his family. Moved to the US many years ago to provide for his family. Endured the hardest challenges in life, fell countless times, and never gave up. Today he lives in the US with his wife and daughter.",
+      "relationships": {
+        "children": ["Juan Pablo Rivillas Ospina", "German Daniel Rivillas Ospina", "Jhon Mario Rivillas Ospina"]
+      },
+      "metadata": {
+        "occupation": "Driver",
+        "location": "Adisson, IL, United States"
+      }
+    },
+    {
+      "name": "Izabela Magalhaes de Souza Lima",
+      "birth_date": "1990-08-10",
+      "death_date": null,
+      "bio": "A very special person. She loves painting, reading, and spending time near her family. The most empathetic person in the family. She unites everyone with her smile and her kindness. Spends her day chasing her nephews, Joao and David, as well as enduring his brother in law Juan Pablo.",
+      "relationships": {
+        "parents": ["Cleolice Magalhaes de Souza Lima", "Evaldo de Souza Lima"]
+      },
+      "metadata": {
+        "occupation": "None",
+        "location": "Belo Horizonte, Brazil"
+      }
+    },
+    {
+      "name": "Cleolice Magalhaes de Souza Lima",
+      "birth_date": "1948-06-29",
+      "death_date": null,
+      "bio": "The biggest hearh in the family. She loves sitting on the kitchen's table and talk with whomever is there. Give her a cup of coffee and a slice of cheese and you'll have the best friend you ever need. Loves fishing and traveling with her family. Spends her day chasing her grandchildren, Joao and David.",
+      "relationships": {
+        "children": ["Izabela Magalhaes de Souza Lima", "Alessandra Magalhes de Souza Lima"]
+      },
+      "metadata": {
+        "occupation": "Retired Lawyer",
+        "location": "Belo Horizonte, Brazil"
       }
     }
   ]
-} 
+}
