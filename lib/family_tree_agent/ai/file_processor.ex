@@ -6,6 +6,8 @@ defmodule FamilyTreeAgent.AI.FileProcessor do
   documents into chunks for vector embeddings using TextChunker.
   """
 
+  @chunk_size 200
+  @chunk_overlap 20
   @context_file_path Path.join([:code.priv_dir(:family_tree_agent), "family_data", "context.json"])
 
   @spec load_documents!(String.t()) :: list(String.t())
@@ -25,5 +27,25 @@ defmodule FamilyTreeAgent.AI.FileProcessor do
       {:error, reason} ->
         raise "Failed to read file: #{inspect(reason)}"
     end
+  end
+
+  @spec split_documents(list(String.t())) :: list(String.t())
+  def split_documents(documents) do
+    Enum.flat_map(documents, fn doc ->
+      split_text_with_chunker(doc)
+    end)
+  end
+
+  defp split_text_with_chunker(text) do
+    opts = [
+      chunk_size: @chunk_size,
+      chunk_overlap: @chunk_overlap,
+      format: :plaintext,
+      strategy: TextChunker.Strategies.RecursiveChunk
+    ]
+
+    text
+    |> TextChunker.split(opts)
+    |> Enum.map(& &1.text)
   end
 end

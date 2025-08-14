@@ -33,18 +33,16 @@ defmodule FamilyTreeAgent.AI.InMemoryVectorStore do
     # Calculate cosine similarity between query and all stored embeddings
     similarities = cosine_similarity_batch(query_embedding, store.embeddings)
 
-    # Get indices of top k similarities
-    {top_similarities, top_indices} =
-      similarities
-      |> Nx.to_flat_list()
-      |> Enum.with_index()
-      |> Enum.sort_by(fn {similarity, _idx} -> similarity end, :desc)
-      |> Enum.take(k)
-      |> Enum.unzip()
+    # Use Nx.top_k for efficient top-k selection without flattening all records
+    {top_similarities, top_indices} = Nx.top_k(similarities, k: k)
+
+    # Convert tensors to lists for easier processing
+    top_similarities_list = Nx.to_flat_list(top_similarities)
+    top_indices_list = Nx.to_flat_list(top_indices)
 
     # Return documents with their similarity scores
-    top_indices
-    |> Enum.zip(top_similarities)
+    top_indices_list
+    |> Enum.zip(top_similarities_list)
     |> Enum.map(fn {idx, similarity} ->
       {Enum.at(store.documents, idx), similarity}
     end)
