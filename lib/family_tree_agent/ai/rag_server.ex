@@ -49,7 +49,11 @@ defmodule FamilyTreeAgent.AI.RAGServer do
       {:error, error} ->
         # Log the error but don't crash - start in degraded mode
         require Logger
-        Logger.warning("RAG system failed to initialize: #{inspect(error)}. Starting in degraded mode.")
+
+        Logger.warning(
+          "RAG system failed to initialize: #{inspect(error)}. Starting in degraded mode."
+        )
+
         {:ok, %{status: :degraded, error: error}}
     end
   end
@@ -69,7 +73,11 @@ defmodule FamilyTreeAgent.AI.RAGServer do
   end
 
   @impl GenServer
-  def handle_call({:answer_question, question}, _from, %{status: :ready, rag_system: rag_system} = state) do
+  def handle_call(
+        {:answer_question, question},
+        _from,
+        %{status: :ready, rag_system: rag_system} = state
+      ) do
     try do
       answer = FamilyTreeRAG.one_shot(rag_system, question)
       {:reply, answer, state}
@@ -81,7 +89,11 @@ defmodule FamilyTreeAgent.AI.RAGServer do
   end
 
   @impl GenServer
-  def handle_call({:answer_question, _question}, _from, %{status: :degraded, error: error} = state) do
+  def handle_call(
+        {:answer_question, _question},
+        _from,
+        %{status: :degraded, error: error} = state
+      ) do
     error_msg = "RAG system is not available: #{error}"
     {:reply, error_msg, state}
   end
