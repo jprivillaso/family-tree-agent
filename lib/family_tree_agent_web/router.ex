@@ -25,7 +25,6 @@ defmodule FamilyTreeAgentWeb.Router do
     get "/family_tree", FamilyTreeController, :show
 
     # AI-powered answer endpoints
-    post "/family_members/answer", FamilyMemberController, :answer
     post "/family_members/answer_general", FamilyMemberController, :answer_general
 
     # OPTIONS routes for CORS support

@@ -169,42 +169,6 @@ defmodule FamilyTreeAgentWeb.FamilyMemberController do
     end
   end
 
-  @spec answer(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  @doc """
-  POST /api/family_members/answer
-  Answers questions about a specific family member using AI.
-  """
-  def answer(conn, %{"person_name" => person_name, "question" => question}) do
-    full_question = "Tell me about #{person_name}: #{question}"
-
-    try do
-      answer = RAGServer.answer_question(full_question)
-
-      conn
-      |> put_status(:ok)
-      |> json(%{
-        success: true,
-        data: %{
-          person_name: person_name,
-          question: question,
-          answer: answer
-        }
-      })
-    rescue
-      error ->
-        conn
-        |> put_status(:internal_server_error)
-        |> json(%{
-          success: false,
-          error: %{
-            message: "Failed to generate answer: #{Exception.message(error)}",
-            person_name: person_name,
-            question: question
-          }
-        })
-    end
-  end
-
   @spec answer_general(Plug.Conn.t(), map()) :: Plug.Conn.t()
   @doc """
   POST /api/family_members/answer_general
