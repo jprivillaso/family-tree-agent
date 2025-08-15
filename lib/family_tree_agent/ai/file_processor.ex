@@ -28,24 +28,4 @@ defmodule FamilyTreeAgent.AI.FileProcessor do
         raise "Failed to read file: #{inspect(reason)}"
     end
   end
-
-  @spec split_documents(list(String.t())) :: list(String.t())
-  def split_documents(documents) do
-    Enum.flat_map(documents, fn doc ->
-      split_text_with_chunker(doc)
-    end)
-  end
-
-  defp split_text_with_chunker(text) do
-    opts = [
-      chunk_size: @chunk_size,
-      chunk_overlap: @chunk_overlap,
-      format: :plaintext,
-      strategy: TextChunker.Strategies.RecursiveChunk
-    ]
-
-    text
-    |> TextChunker.split(opts)
-    |> Enum.map(& &1.text)
-  end
 end

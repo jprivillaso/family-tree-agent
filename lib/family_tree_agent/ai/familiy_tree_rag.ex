@@ -7,7 +7,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
 
   alias FamilyTreeAgent.AI.FileProcessor
   alias FamilyTreeAgent.AI.InMemoryVectorStore
-  alias FamilyTreeAgent.AI.BumblebeeClient
+  alias FamilyTreeAgent.AI.RAGClient
 
   @type t :: %__MODULE__{
           ai_client: any(),
@@ -40,12 +40,12 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
   end
 
   def init(client_config \\ []) do
-    with {:ok, ai_client} <- BumblebeeClient.init(client_config) do
+    with {:ok, ai_client} <- RAGClient.init(client_config) do
       IO.puts("Loading and processing documents...")
       documents = FileProcessor.load_documents!()
 
       IO.puts("Creating embeddings for #{length(documents)} chunks...")
-      documents_with_embeddings = BumblebeeClient.create_embeddings_batch(ai_client, documents)
+      documents_with_embeddings = RAGClient.create_embeddings_batch(ai_client, documents)
 
       IO.puts("Building vector store...")
       vector_store = InMemoryVectorStore.new(documents_with_embeddings)
@@ -162,7 +162,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
 
     IO.puts("🤖 Generating AI response using RAG context...")
 
-    case BumblebeeClient.generate_text(rag_system.ai_client, prompt) do
+    case RAGClient.generate_text(rag_system.ai_client, prompt) do
       {:ok, generated_text} ->
         "🤖 AI Response: #{generated_text}."
 
@@ -172,7 +172,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
   end
 
   defp similarity_search(rag_system, query, k) do
-    query_embedding = BumblebeeClient.create_embedding(rag_system.ai_client, query)
+    query_embedding = RAGClient.create_embedding(rag_system.ai_client, query)
     InMemoryVectorStore.similarity_search(rag_system.vector_store, query_embedding, k)
   end
 end
