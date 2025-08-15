@@ -1,4 +1,4 @@
-defmodule FamilyTreeAgent.AI.BumblebeeClient do
+defmodule FamilyTreeAgent.AI.RAGClient do
   @moduledoc """
   Bumblebee-based implementation of the AI client.
 
