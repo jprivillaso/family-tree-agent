@@ -23,7 +23,8 @@ defmodule FamilyTreeAgentWeb.HealthController do
       status: overall_status,
       timestamp: DateTime.utc_now(),
       components: %{
-        database: "healthy",  # Assume healthy if we got this far
+        # Assume healthy if we got this far
+        database: "healthy",
         rag_system: rag_status
       }
     })
@@ -32,6 +33,7 @@ defmodule FamilyTreeAgentWeb.HealthController do
   defp get_rag_status do
     try do
       state = RAGServer.get_state()
+
       case state do
         %{status: :ready} ->
           %{status: :ready, message: "RAG system is operational"}
