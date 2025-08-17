@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # Neo4j Graph Database for Family Tree Data
+  neo4j:
+    image: neo4j:5.15-community
+    container_name: family-tree-neo4j
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    environment:
+      # Authentication
+      NEO4J_AUTH: neo4j/familytree123
+
+      # Database configuration
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+      NEO4J_dbms_security_procedures_allowlist: apoc.*
+
+      # Memory settings
+      NEO4J_dbms_memory_heap_initial__size: 512m
+      NEO4J_dbms_memory_heap_max__size: 1G
+      NEO4J_dbms_memory_pagecache_size: 512m
+
+      # Performance settings
+      NEO4J_dbms_default__listen__address: 0.0.0.0
+      NEO4J_dbms_connector_bolt_listen__address: 0.0.0.0:7687
+      NEO4J_dbms_connector_http_listen__address: 0.0.0.0:7474
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_import:/var/lib/neo4j/import
+      - neo4j_plugins:/plugins
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p familytree123 'RETURN 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # # Ollama for Local LLM (Optional - can be run separately)
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: family-tree-ollama
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+  #   restart: unless-stopped
+  #   environment:
+  #     - OLLAMA_HOST=0.0.0.0
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 60s
+
+  # Family Tree Agent Application (Optional - for containerized deployment)
+  # Uncomment when you want to run the Elixir app in Docker
+  # family-tree-agent:
+  #   build: .
+  #   container_name: family-tree-app
+  #   ports:
+  #     - "4000:4000"
+  #   environment:
+  #     - MIX_ENV=prod
+  #     - DATABASE_URL=ecto://neo4j:familytree123@neo4j:7687/neo4j
+  #     - OLLAMA_URL=http://ollama:11434
+  #   depends_on:
+  #     neo4j:
+  #       condition: service_healthy
+  #     ollama:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+
+volumes:
+  neo4j_data:
+    driver: local
+  neo4j_logs:
+    driver: local
+  neo4j_import:
+    driver: local
+  neo4j_plugins:
+    driver: local
+  # ollama_data:
+  #   driver: local
+
+networks:
+  default:
+    name: family-tree-network
