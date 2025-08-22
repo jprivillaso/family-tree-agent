@@ -8,11 +8,11 @@ defmodule FamilyTreeAgent.AI.RAGServer do
 
   use GenServer
 
-  alias FamilyTreeAgent.AI.FamilyTreeRAG
+  alias FamilyTreeAgent.AI.FamiliyTreeGraphRAG
 
   @name __MODULE__
 
-  # Client API
+  require Logger
 
   @spec start_link(keyword()) :: GenServer.on_start()
   def start_link(opts \\ []) do
@@ -41,34 +41,16 @@ defmodule FamilyTreeAgent.AI.RAGServer do
 
   @impl GenServer
   def init(_opts) do
-    # Try to initialize, but don't crash if it fails
-    case safe_init() do
-      {:ok, rag_system} ->
+    Logger.info("Initializing RAG Server with Graph RAG system...")
+
+    case FamiliyTreeGraphRAG.init() do
+      %FamiliyTreeGraphRAG{} = rag_system ->
+        Logger.info("✅ Graph RAG system initialized successfully")
         {:ok, %{status: :ready, rag_system: rag_system}}
 
       {:error, error} ->
-        # Log the error but don't crash - start in degraded mode
-        require Logger
-
-        Logger.warning(
-          "RAG system failed to initialize: #{inspect(error)}. Starting in degraded mode."
-        )
-
-        {:ok, %{status: :degraded, error: error}}
-    end
-  end
-
-  defp safe_init() do
-    try do
-      case FamilyTreeRAG.init() do
-        {:error, error} -> {:error, error}
-        rag_system -> {:ok, rag_system}
-      end
-    rescue
-      error -> {:error, Exception.message(error)}
-    catch
-      :exit, reason -> {:error, "Process exit: #{inspect(reason)}"}
-      error -> {:error, "Unexpected error: #{inspect(error)}"}
+        Logger.error("❌ Failed to initialize Graph RAG system: #{inspect(error)}")
+        {:ok, %{status: :degraded, error: inspect(error)}}
     end
   end
 
@@ -79,11 +61,14 @@ defmodule FamilyTreeAgent.AI.RAGServer do
         %{status: :ready, rag_system: rag_system} = state
       ) do
     try do
-      answer = FamilyTreeRAG.one_shot(rag_system, question)
-      {:reply, answer, state}
+      case FamiliyTreeGraphRAG.answer(rag_system, question) do
+        {:ok, answer} -> {:reply, answer, state}
+        {:error, error} -> {:reply, "Error: #{error}", state}
+      end
     rescue
       error ->
         error_msg = "Error generating answer: #{Exception.message(error)}"
+        Logger.error(error_msg)
         {:reply, error_msg, state}
     end
   end

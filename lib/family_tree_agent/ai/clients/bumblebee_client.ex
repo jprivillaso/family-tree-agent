@@ -175,7 +175,8 @@ defmodule FamilyTreeAgent.AI.Clients.BumblebeeClient do
     %{
       embedding_model: client.embedding_model_name,
       chat_model: client.chat_model_name,
-      provider: "Bumblebee/HuggingFace"
+      provider: "Bumblebee/HuggingFace",
+      base_url: nil
     }
   end
 

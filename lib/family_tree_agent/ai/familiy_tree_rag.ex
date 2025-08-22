@@ -97,8 +97,8 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
     end
   end
 
-  @spec one_shot(t(), String.t()) :: String.t() | {:error, String.t()}
-  def one_shot(rag_system, query) do
+  @spec answer(t(), String.t()) :: String.t() | {:error, String.t()}
+  def answer(rag_system, query) do
     relevant_docs_with_scores = similarity_search(rag_system, query, 3)
 
     relevant_docs_with_scores =
