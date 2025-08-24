@@ -49,14 +49,11 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
           Logger.info("Continuing initialization - queries may fail if Neo4J is not available")
       end
 
-      graph_rag = %__MODULE__{
+      %__MODULE__{
         ai_client: ai_client,
         cypher_tool: cypher_tool,
         neo4j_tool: neo4j_tool
       }
-
-      Logger.info("✅ FamilyTreeGraphRAG initialized successfully!")
-      {:ok, graph_rag}
     else
       {:error, reason} ->
         Logger.error("❌ Failed to initialize FamilyTreeGraphRAG: #{reason}")
@@ -162,6 +159,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
     3. If multiple people are found, list them clearly
     4. Keep the response concise but informative
     5. If no relevant information is found, say so clearly
+    6. Use the name in the map to match the person asked in the prompt
 
     Response:
     """

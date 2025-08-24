@@ -77,7 +77,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
     3. General Case
     You should return a single line with the person's name. Try to match the question to an attribute of the person
     - name
-    - biography
+    - bio
     - relationships
     - hobbies
 
