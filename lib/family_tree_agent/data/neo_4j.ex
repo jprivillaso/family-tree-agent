@@ -56,6 +56,7 @@ defmodule FamilyTreeAgent.Data.Neo4j do
                     headers: [{"Authorization", @auth_header}, {"Content-Type", "application/json"}]) do
         {:ok, %{status: 200} = response} ->
           Logger.info("Cypher query executed successfully")
+          Logger.info(response.body)
           {:ok, response.body}
 
         {:ok, %{status: status} = response} ->
