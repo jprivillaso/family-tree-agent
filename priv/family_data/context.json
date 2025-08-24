@@ -6,7 +6,7 @@
       "death_date": null,
       "bio": "Loves to travel with his family, learn about new technologies and write in his blog. He's originally from Colombia but moved to Brazil in 2013. After that, has has lived in the United States for a year and today he spends most of the time with his family in their beach house in Sao Miguel dos Milagres. Coffee lover, tail teller and a very empathetic person. His family is his everything.",
       "relationships": {
-        "spouse": "Alessandra Magalhes de Souza Lima",
+        "spouse": "Alessandra Magalhaes de Souza Lima",
         "children": ["Joao Rivillas de Magalhaes", "David Rivillas de Magalhaes"],
         "parents": ["Rolsalba del Consuelo Ospina Montoya", "Tulio Mario Rivillas Zapata"]
       },
@@ -16,7 +16,7 @@
       }
     },
     {
-      "name": "Alessandra Magalhes de Souza Lima",
+      "name": "Alessandra Magalhaes de Souza Lima",
       "birth_date": "1985-12-05",
       "death_date": null,
       "bio": "Passionate mother. Loves to spend time with her family, traveling and discovering new places in the nature. She's a natural dreamer. What she visions, she makes happen. Dedicated mother and wife. A woman that conquers anybody's heart with her smile, kindness and contagious laugh.",
@@ -36,7 +36,7 @@
       "death_date": null,
       "bio": "A very curious child. Loves to ride his bike with his brother David, go to the beach to grab crabs and travel with his family. The world is his home.",
       "relationships": {
-        "parents": ["Juan Pablo Rivillas Ospina", "Alessandra Magalhes de Souza Lima"]
+        "parents": ["Juan Pablo Rivillas Ospina", "Alessandra Magalhaes de Souza Lima"]
       },
       "metadata": {
         "occupation": "None",
@@ -49,7 +49,7 @@
       "death_date": null,
       "bio": "Funniest child. Loves to ride his bike with his brother Joao, go to the beach to grab crabs. He loves animals and loves any adventure with his brother. He's very smart and loves to explore the nature, ask questions and look at the sky.",
       "relationships": {
-        "parents": ["Juan Pablo Rivillas Ospina", "Alessandra Magalhes de Souza Lima"]
+        "parents": ["Juan Pablo Rivillas Ospina", "Alessandra Magalhaes de Souza Lima"]
       },
       "metadata": {
         "occupation": "None",
@@ -62,7 +62,7 @@
       "death_date": null,
       "bio": "Dedicated mother and daughter. Strong woman who raised three boys on her own for many years. Loves a crossword puzzle, reading the three musketeers and enjoying a cup of coffee in the morning.",
       "relationships": {
-        "children": ["Juan Pablo Rivillas Ospina", "Alessandra Magalhes de Souza Lima"]
+        "children": ["Juan Pablo Rivillas Ospina", "Alessandra Magalhaes de Souza Lima"]
       },
       "metadata": {
         "occupation": "None",
@@ -101,7 +101,7 @@
       "death_date": null,
       "bio": "The biggest hearh in the family. She loves sitting on the kitchen's table and talk with whomever is there. Give her a cup of coffee and a slice of cheese and you'll have the best friend you ever need. Loves fishing and traveling with her family. Spends her day chasing her grandchildren, Joao and David.",
       "relationships": {
-        "children": ["Izabela Magalhaes de Souza Lima", "Alessandra Magalhes de Souza Lima"]
+        "children": ["Izabela Magalhaes de Souza Lima", "Alessandra Magalhaes de Souza Lima"]
       },
       "metadata": {
         "occupation": "Retired Lawyer",

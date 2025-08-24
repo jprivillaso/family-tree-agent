@@ -17,13 +17,4 @@ defmodule FamilyTreeAgent.AI.Clients.PlannerBehavior do
   """
   @callback execute_plan(planner :: any(), query :: String.t()) ::
               {:ok, result :: any()} | {:error, reason :: any()}
-
-  @doc """
-  Get information about the planner's configuration and available tools.
-  """
-  @callback info(planner :: any()) :: %{
-              tools: list(String.t()),
-              provider: String.t(),
-              description: String.t()
-            }
 end

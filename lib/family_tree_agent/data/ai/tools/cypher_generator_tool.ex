@@ -52,7 +52,7 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
 
     Node Types:
     - Person: Represents a family member
-      Properties: name (string), birth_date (date), death_date (date), biography (string), hobbies (string)
+      Properties: name (string), birth_date (date), death_date (date), bio (string), hobbies (string)
 
     Relationship Types:
     - PARENT_OF: Connects a parent to their child
@@ -71,10 +71,16 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
     4. Find spouse of a person:
        MATCH (p1:Person {name: "John Doe"})-[:MARRIED_TO]-(p2:Person) RETURN p2
 
-    5. Find all descendants of a person:
+    5. Find siblings of a person (people with same parents):
+       MATCH (person:Person {name: "John Doe"})<-[:PARENT_OF]-(parent:Person)
+       MATCH (parent)-[:PARENT_OF]->(sibling:Person)
+       WHERE sibling <> person
+       RETURN DISTINCT sibling
+
+    6. Find all descendants of a person:
        MATCH (ancestor:Person {name: "John Doe"})-[:PARENT_OF*]->(descendant:Person) RETURN descendant
 
-    6. Find all ancestors of a person:
+    7. Find all ancestors of a person:
        MATCH (ancestor:Person)-[:PARENT_OF*]->(descendant:Person {name: "Jane Doe"}) RETURN ancestor
     """
   end

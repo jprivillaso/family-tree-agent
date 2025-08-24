@@ -1,14 +1,14 @@
 defmodule FamilyTreeAgent.RAGServer do
   @moduledoc """
-  GenServer that manages the Family Tree RAG system.
+  GenServer that manages the Family Tree Graph RAG system.
 
-  Initializes the chat model, tokenizer, and generation config once on startup
-  and keeps them in state to avoid reloading on every request.
+  Initializes the graph RAG system with Neo4J connectivity and AI client
+  once on startup and keeps them in state to avoid reloading on every request.
   """
 
   use GenServer
 
-  alias FamilyTreeAgent.AI.FamilyTreeRAG
+  alias FamilyTreeAgent.AI.FamilyTreeGraphRAG
 
   @name __MODULE__
 
@@ -60,7 +60,7 @@ defmodule FamilyTreeAgent.RAGServer do
 
   defp safe_init() do
     try do
-      case FamilyTreeRAG.init() do
+      case FamilyTreeGraphRAG.init() do
         {:error, error} -> {:error, error}
         rag_system -> {:ok, rag_system}
       end
@@ -79,7 +79,7 @@ defmodule FamilyTreeAgent.RAGServer do
         %{status: :ready, rag_system: rag_system} = state
       ) do
     try do
-      answer = FamilyTreeRAG.one_shot(rag_system, question)
+      answer = FamilyTreeGraphRAG.one_shot(rag_system, question)
       {:reply, answer, state}
     rescue
       error ->

@@ -10,7 +10,7 @@ defmodule FamilyTreeAgent.Data.Neo4j do
   @base_url "http://localhost:7474"
   @auth_header "Basic " <> Base.encode64("neo4j:familytree123")
 
-    @doc """
+  @doc """
   Test the Neo4j connection via HTTP API.
   """
   def test_connection do
@@ -36,7 +36,7 @@ defmodule FamilyTreeAgent.Data.Neo4j do
     end
   end
 
-    @doc """
+  @doc """
   Execute a Cypher query via HTTP API.
   """
   def execute_cypher(query, params \\ %{}) do
@@ -52,8 +52,9 @@ defmodule FamilyTreeAgent.Data.Neo4j do
       }
 
       case Req.post("#{@base_url}/db/neo4j/tx/commit",
-                    json: body,
-                    headers: [{"Authorization", @auth_header}, {"Content-Type", "application/json"}]) do
+             json: body,
+             headers: [{"Authorization", @auth_header}, {"Content-Type", "application/json"}]
+           ) do
         {:ok, %{status: 200} = response} ->
           Logger.info("Cypher query executed successfully")
           Logger.info(response.body)

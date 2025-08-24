@@ -6,7 +6,11 @@ defmodule FamilyTreeAgent.AI.FileProcessor do
   documents into chunks for vector embeddings using TextChunker.
   """
 
-  @context_file_path Path.join([:code.priv_dir(:family_tree_agent), "family_data", "context.json"])
+  @context_file_path Path.join([
+                       :code.priv_dir(:family_tree_agent),
+                       "family_data",
+                       "context.json"
+                     ])
 
   @spec load_documents!(String.t()) :: list(String.t())
   def load_documents!(file_path \\ @context_file_path) do
