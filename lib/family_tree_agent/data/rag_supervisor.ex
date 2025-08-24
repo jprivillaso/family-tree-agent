@@ -1,4 +1,4 @@
-defmodule FamilyTreeAgent.AI.RAGSupervisor do
+defmodule FamilyTreeAgent.RAGSupervisor do
   @moduledoc """
   Supervisor for AI/RAG related processes.
 
@@ -15,7 +15,7 @@ defmodule FamilyTreeAgent.AI.RAGSupervisor do
   @impl true
   def init(_init_arg) do
     children = [
-      {FamilyTreeAgent.AI.RAGServer, []}
+      {FamilyTreeAgent.RAGServer, []}
     ]
 
     # Use :temporary restart strategy so if RAG server fails to start,

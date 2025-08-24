@@ -1,4 +1,4 @@
-defmodule FamilyTreeAgent.AI.RAGBehavior do
+defmodule FamilyTreeAgent.AI.Clients.RAGBehavior do
   @moduledoc """
   Behavior for AI clients that provide embedding and chat capabilities.
 

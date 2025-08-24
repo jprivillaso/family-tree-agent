@@ -5,7 +5,7 @@ defmodule FamilyTreeAgentWeb.HealthController do
 
   use FamilyTreeAgentWeb, :controller
 
-  alias FamilyTreeAgent.AI.RAGServer
+  alias FamilyTreeAgent.RAGServer
 
   @spec health(Plug.Conn.t(), map()) :: Plug.Conn.t()
   @doc """

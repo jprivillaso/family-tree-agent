@@ -22,13 +22,11 @@ defmodule FamilyTreeAgentWeb.Router do
     get "/health", HealthController, :health
 
     resources "/family_members", FamilyMemberController, except: [:new, :edit]
-    get "/family_tree", FamilyTreeController, :show
 
     # AI-powered answer endpoints
     post "/family_members/answer_general", FamilyMemberController, :answer_general
 
     # OPTIONS routes for CORS support
-    options "/family_tree", FamilyTreeController, :options
     options "/family_members", FamilyMemberController, :options
     options "/family_members/:id", FamilyMemberController, :options
     options "/family_members/answer", FamilyMemberController, :options

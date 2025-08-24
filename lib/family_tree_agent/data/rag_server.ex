@@ -1,4 +1,4 @@
-defmodule FamilyTreeAgent.AI.RAGServer do
+defmodule FamilyTreeAgent.RAGServer do
   @moduledoc """
   GenServer that manages the Family Tree RAG system.
 

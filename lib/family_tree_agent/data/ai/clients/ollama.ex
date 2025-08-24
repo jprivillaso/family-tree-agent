@@ -1,4 +1,4 @@
-defmodule FamilyTreeAgent.AI.Clients.OllamaClient do
+defmodule FamilyTreeAgent.AI.Clients.Ollama do
   @moduledoc """
   Ollama-based implementation of the AI client.
 
@@ -6,7 +6,7 @@ defmodule FamilyTreeAgent.AI.Clients.OllamaClient do
   through HTTP API calls.
   """
 
-  @behaviour FamilyTreeAgent.AI.RAGBehavior
+  @behaviour FamilyTreeAgent.AI.Clients.RAGBehavior
 
   # Default model configurations
   @default_embedding_model "nomic-embed-text"

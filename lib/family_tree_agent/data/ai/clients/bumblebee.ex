@@ -1,4 +1,4 @@
-defmodule FamilyTreeAgent.AI.Clients.BumblebeeClient do
+defmodule FamilyTreeAgent.AI.Clients.Bumblebee do
   @moduledoc """
   Bumblebee-based implementation of the AI client.
 
@@ -6,7 +6,7 @@ defmodule FamilyTreeAgent.AI.Clients.BumblebeeClient do
   through the Bumblebee library.
   """
 
-  @behaviour FamilyTreeAgent.AI.RAGBehavior
+  @behaviour FamilyTreeAgent.AI.Clients.RAGBehavior
 
   # Models from Hugging Faces
   @default_embedding_model "sentence-transformers/all-MiniLM-L6-v2"
