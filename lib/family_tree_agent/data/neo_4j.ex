@@ -1,4 +1,4 @@
-defmodule FamilyTreeAgent.Neo4j.HttpClient do
+defmodule FamilyTreeAgent.Data.Neo4j do
   @moduledoc """
   HTTP-based Neo4j client using Neo4j's REST API.
 

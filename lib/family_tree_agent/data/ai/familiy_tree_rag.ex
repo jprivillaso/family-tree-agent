@@ -7,7 +7,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
 
   alias FamilyTreeAgent.AI.FileProcessor
   alias FamilyTreeAgent.AI.InMemoryVectorStore
-  alias FamilyTreeAgent.AI.Clients.OllamaClient
+  alias FamilyTreeAgent.AI.Clients.Ollama, as: OllamaClient
 
   @type t :: %__MODULE__{
           ai_client: any(),
@@ -18,26 +18,6 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
     :ai_client,
     :vector_store
   ]
-
-  @doc """
-  Main function to run the RAG system interactively.
-  """
-  def run! do
-    case init() do
-      %__MODULE__{} = rag_system ->
-        IO.puts("\n✅ RAG System initialized successfully!")
-        IO.puts("💡 Try questions like:")
-        IO.puts("   - 'Tell me about Jane Doe'")
-        IO.puts("   - 'What are Alice's hobbies?'")
-        IO.puts("   - 'Who is married to John Doe?'")
-
-        interactive_loop(rag_system)
-
-      {:error, error} ->
-        IO.puts("Error initializing RAG system: #{inspect(error)}")
-        raise error
-    end
-  end
 
   def init(client_config \\ []) do
     with {:ok, ai_client} <- OllamaClient.init(client_config) do
@@ -56,44 +36,6 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
       }
     else
       {:error, error} -> {:error, error}
-    end
-  end
-
-  @spec interactive_loop(t()) :: :ok
-  def interactive_loop(rag_system) do
-    query = IO.gets("\nEnter your query (or 'exit' to exit):")
-
-    case query do
-      "exit" ->
-        IO.puts("👋 Goodbye!")
-
-      "" ->
-        IO.puts("Please enter a valid query.")
-        interactive_loop(rag_system)
-
-      _ ->
-        IO.puts("\n🔍 Retrieving relevant documents...")
-        relevant_docs_with_scores = similarity_search(rag_system, query, 3)
-
-        relevant_docs_with_scores =
-          Enum.reject(relevant_docs_with_scores, fn {_doc, score} -> score < 0.05 end)
-
-        IO.puts("\n📄 Top most relevant documents:")
-
-        relevant_docs_with_scores
-        |> Enum.with_index(1)
-        |> Enum.each(fn {{chunk, score}, index} ->
-          preview = String.slice(chunk, 0, 100) <> "..."
-          IO.puts("#{index}. (Score: #{Float.round(score, 3)}) #{preview}")
-          IO.puts(String.duplicate("-", 50))
-        end)
-
-        case generate_ai_response(rag_system, query, relevant_docs_with_scores) do
-          {:ok, response} -> IO.puts("\n💬 Response:\n#{response}")
-          {:error, error} -> IO.puts("\n❌ Error generating response: #{error}")
-        end
-
-        interactive_loop(rag_system)
     end
   end
 
