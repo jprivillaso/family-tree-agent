@@ -55,7 +55,14 @@ defmodule FamilyTreeAgent.AI.Tools.Neo4jExecutorTool do
     results
     |> Enum.flat_map(fn result ->
       case result do
+        %{"columns" => columns, "data" => data} when is_list(columns) and is_list(data) ->
+          # Map each row to column names for proper key-value pairs
+          Enum.map(data, fn row_data ->
+            format_data_row_with_columns(row_data, columns)
+          end)
+
         %{"data" => data} when is_list(data) ->
+          # Fallback to old behavior if no columns
           Enum.map(data, &format_data_row/1)
 
         _ ->
@@ -69,8 +76,22 @@ defmodule FamilyTreeAgent.AI.Tools.Neo4jExecutorTool do
     []
   end
 
+  defp format_data_row_with_columns(%{"row" => row}, columns)
+       when is_list(row) and is_list(columns) do
+    # Zip columns with row values to create proper key-value pairs
+    columns
+    |> Enum.zip(row)
+    |> Enum.into(%{})
+    |> format_mapped_data()
+  end
+
+  defp format_data_row_with_columns(row_data, _columns) do
+    Logger.warning("Unexpected row data format: #{inspect(row_data)}")
+    row_data
+  end
+
   defp format_data_row(%{"row" => row}) when is_list(row) do
-    # Convert Neo4J row data to a more readable format
+    # Convert Neo4J row data to a more readable format (legacy fallback)
     row
     |> Enum.map(&format_node_or_value/1)
     |> Enum.reject(&is_nil/1)
@@ -79,6 +100,34 @@ defmodule FamilyTreeAgent.AI.Tools.Neo4jExecutorTool do
   defp format_data_row(data) do
     Logger.info("Unexpected data row format: #{inspect(data)}")
     data
+  end
+
+  defp format_mapped_data(mapped_row) when is_map(mapped_row) do
+    # Clean up and format the mapped data for better LLM consumption
+    formatted =
+      mapped_row
+      |> Enum.map(fn {key, value} ->
+        {key, format_node_or_value(value)}
+      end)
+      |> Enum.into(%{})
+      |> remove_nil_values()
+
+    # If it's a single node column (like "p"), extract just the node data
+    case Map.keys(formatted) do
+      [single_key] when is_binary(single_key) ->
+        case Map.get(formatted, single_key) do
+          node_data when is_map(node_data) -> node_data
+          _ -> formatted
+        end
+      _ ->
+        formatted
+    end
+  end
+
+  defp remove_nil_values(map) when is_map(map) do
+    map
+    |> Enum.reject(fn {_key, value} -> is_nil(value) end)
+    |> Enum.into(%{})
   end
 
   defp format_node_or_value(%{"name" => name} = node) when is_map(node) do

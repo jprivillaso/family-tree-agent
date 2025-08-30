@@ -52,36 +52,98 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
 
     Node Types:
     - Person: Represents a family member
-      Properties: name (string), birth_date (date), death_date (date), bio (string), hobbies (string)
+      Properties: name (string), birth_date (date), death_date (date), bio (string), occupation (string), location (string)
 
-    Relationship Types:
-    - PARENT_OF: Connects a parent to their child
+    Relationship Types (Keep it Simple):
+    - PARENT_OF: Connects a parent to their child (directional: parent -> child)
     - MARRIED_TO: Connects spouses (bidirectional)
 
-    Example Queries:
-    1. Find a person by name:
-       MATCH (p:Person {name: "John Doe"}) RETURN p
+    Smart Query Patterns (Derive Complex Relationships from Basic Ones):
 
-    2. Find all children of a person:
-       MATCH (parent:Person {name: "John Doe"})-[:PARENT_OF]->(child:Person) RETURN child
+    1. Find a person by name (exact match):
+       MATCH (p:Person {name: "Juan Pablo Rivillas Ospina"}) RETURN p
 
-    3. Find parents of a person:
-       MATCH (parent:Person)-[:PARENT_OF]->(child:Person {name: "Jane Doe"}) RETURN parent
+    2. Find a person by name (partial match):
+       MATCH (p:Person) WHERE p.name CONTAINS "Juan Pablo" RETURN p
 
-    4. Find spouse of a person:
-       MATCH (p1:Person {name: "John Doe"})-[:MARRIED_TO]-(p2:Person) RETURN p2
+    3. Find all children of a person:
+       MATCH (parent:Person {name: "Juan Pablo Rivillas Ospina"})-[:PARENT_OF]->(child:Person) RETURN child
 
-    5. Find siblings of a person (people with same parents):
-       MATCH (person:Person {name: "John Doe"})<-[:PARENT_OF]-(parent:Person)
+    4. Find parents of a person:
+       MATCH (parent:Person)-[:PARENT_OF]->(child:Person {name: "Joao Rivillas de Magalhaes"}) RETURN parent
+
+    5. Find spouse of a person:
+       MATCH (p1:Person {name: "Juan Pablo Rivillas Ospina"})-[:MARRIED_TO]-(p2:Person) RETURN p2
+
+    6. Find siblings (children of same parents):
+       MATCH (person:Person {name: "Joao Rivillas de Magalhaes"})<-[:PARENT_OF]-(parent:Person)
        MATCH (parent)-[:PARENT_OF]->(sibling:Person)
        WHERE sibling <> person
        RETURN DISTINCT sibling
 
-    6. Find all descendants of a person:
-       MATCH (ancestor:Person {name: "John Doe"})-[:PARENT_OF*]->(descendant:Person) RETURN descendant
+    7. Find grandparents (parents of parents):
+       MATCH (grandparent:Person)-[:PARENT_OF*2]->(grandchild:Person {name: "Joao Rivillas de Magalhaes"})
+       RETURN grandparent
 
-    7. Find all ancestors of a person:
-       MATCH (ancestor:Person)-[:PARENT_OF*]->(descendant:Person {name: "Jane Doe"}) RETURN ancestor
+    8. Find grandchildren (children of children):
+       MATCH (grandparent:Person {name: "Cleolice Magalhaes de Souza Lima"})-[:PARENT_OF*2]->(grandchild:Person)
+       RETURN grandchild
+
+    9. Find ALL ancestors (recursive up the family tree):
+       MATCH (ancestor:Person)-[:PARENT_OF*1..10]->(descendant:Person {name: "David Rivillas de Magalhaes"})
+       RETURN ancestor, length(()-[:PARENT_OF*]->(descendant)) as generation_distance
+       ORDER BY generation_distance
+
+    10. Find ALL descendants (recursive down the family tree):
+        MATCH (ancestor:Person {name: "Juan Pablo Rivillas Ospina"})-[:PARENT_OF*1..10]->(descendant:Person)
+        RETURN descendant, length((ancestor)-[:PARENT_OF*]->(descendant)) as generation_distance
+        ORDER BY generation_distance
+
+    11. Find uncles/aunts (siblings of parents):
+        MATCH (person:Person {name: "Joao Rivillas de Magalhaes"})<-[:PARENT_OF]-(parent:Person)
+        MATCH (parent)<-[:PARENT_OF]-(grandparent:Person)
+        MATCH (grandparent)-[:PARENT_OF]->(uncle_aunt:Person)
+        WHERE uncle_aunt <> parent
+        RETURN DISTINCT uncle_aunt
+
+    12. Find cousins (children of uncles/aunts):
+        MATCH (person:Person {name: "Joao Rivillas de Magalhaes"})<-[:PARENT_OF]-(parent:Person)
+        MATCH (parent)<-[:PARENT_OF]-(grandparent:Person)
+        MATCH (grandparent)-[:PARENT_OF]->(uncle_aunt:Person)
+        MATCH (uncle_aunt)-[:PARENT_OF]->(cousin:Person)
+        WHERE uncle_aunt <> parent
+        RETURN DISTINCT cousin
+
+    13. Find relationship path between two people:
+        MATCH path = shortestPath((p1:Person {name: "Joao Rivillas de Magalhaes"})-[*1..6]-(p2:Person {name: "David Rivillas de Magalhaes"}))
+        RETURN path, [r in relationships(path) | type(r)] as relationship_types, length(path) as path_length
+
+    14. Find in-laws (spouse's family):
+        MATCH (person:Person {name: "Juan Pablo Rivillas Ospina"})-[:MARRIED_TO]-(spouse:Person)
+        MATCH (spouse)<-[:PARENT_OF]-(in_law:Person)
+        RETURN in_law as parent_in_law
+
+    15. Find family members by location:
+        MATCH (p:Person) WHERE p.location CONTAINS "Brazil" RETURN p
+
+    16. Find family members by occupation:
+        MATCH (p:Person) WHERE p.occupation = "Lawyer" RETURN p
+
+    Advanced Patterns:
+    - Use variable-length paths [:PARENT_OF*1..10] for recursive queries
+    - Use OPTIONAL MATCH for relationships that might not exist
+    - Use UNION to combine multiple relationship patterns
+    - Use collect() and DISTINCT to group related results
+    - Use length() to calculate relationship distance
+    - Use ORDER BY to sort by generation distance
+
+    Important Notes:
+    - Use exact name matching when the full name is provided in the query
+    - Use CONTAINS for partial name matching
+    - For complex relationships, think in terms of path traversal through PARENT_OF and MARRIED_TO
+    - Always include DISTINCT when using path queries to avoid duplicates
+    - Limit results to 20 items maximum using LIMIT 20
+    - Use variable-length relationships (*1..10) for recursive ancestor/descendant queries
     """
   end
 
@@ -93,11 +155,18 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
 
     Instructions:
     1. Convert the natural language query to a valid Cypher query
-    2. Return ONLY the Cypher query, no explanations
+    2. Return ONLY the Cypher query, no explanations or markdown
     3. Use proper Cypher syntax
-    4. Handle case-insensitive name matching when appropriate
-    5. Return relevant properties (name, birth_date, death_date, bio, hobbies)
-    6. Limit results to 20 items maximum using LIMIT 20
+    4. For relationship queries, use smart path traversal patterns from the examples above
+    5. For "ancestors" queries, use recursive patterns like [:PARENT_OF*1..10] to go up the family tree
+    6. For "descendants" queries, use recursive patterns to go down the family tree
+    7. For "siblings" queries, find shared parents using the pattern shown in example 6
+    8. For "relationship between X and Y" queries, use shortestPath to find connections
+    9. Use exact name matching when full names are provided
+    10. Use CONTAINS for partial name matching
+    11. Always include DISTINCT when using path queries to avoid duplicates
+    12. Return relevant properties (name, birth_date, death_date, bio, occupation, location)
+    13. Limit results to 20 items maximum using LIMIT 20
 
     Natural Language Query: #{natural_language_query}
 

@@ -57,7 +57,6 @@ defmodule FamilyTreeAgent.Data.Neo4j do
            ) do
         {:ok, %{status: 200} = response} ->
           Logger.info("Cypher query executed successfully")
-          Logger.info(response.body)
           {:ok, response.body}
 
         {:ok, %{status: status} = response} ->

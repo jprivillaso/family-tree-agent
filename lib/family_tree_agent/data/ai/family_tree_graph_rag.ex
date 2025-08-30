@@ -111,9 +111,6 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
 
     case Neo4jExecutorTool.execute_query(graph_rag.neo4j_tool, cypher_query) do
       {:ok, results} ->
-        IO.inspect(results, label: "results")
-
-        Logger.info("✅ Query executed successfully, found #{length(results)} results")
         {:ok, results}
 
       {:error, reason} ->
@@ -131,6 +128,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
       case generate_natural_language_response(graph_rag, original_query, results) do
         {:ok, response} ->
           Logger.info("✅ Final response generated")
+          IO.inspect(response, label: "response")
           {:ok, response}
 
         {:error, reason} ->
@@ -143,6 +141,8 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
   end
 
   defp generate_natural_language_response(%__MODULE__{} = graph_rag, query, results) do
+    IO.inspect(results, label: "results")
+
     results_text = format_results_for_ai(results)
 
     prompt = """
@@ -153,13 +153,14 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
     Database Results:
     #{results_text}
 
-    Instructions:
-    1. Answer the question in a natural, conversational way
-    2. Use the information from the database results
-    3. If multiple people are found, list them clearly
-    4. Keep the response concise but informative
-    5. If no relevant information is found, say so clearly
-    6. Use the name in the map to match the person asked in the prompt
+    IMPORTANT INSTRUCTIONS:
+    1. You MUST use ONLY the information provided in the Database Results above
+    2. The Database Results contain the answer to the question - do NOT ignore this data
+    3. If the Database Results show a person with a name, birth_date, and bio, then that person EXISTS in our family tree
+    4. Answer the question using the provided data in a natural, conversational way
+    5. Use the bio field to describe who this person is
+    6. If multiple people are found, list them clearly
+    7. ONLY say "no information found" if the Database Results are actually empty
 
     Response:
     """
@@ -183,16 +184,20 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
   end
 
   defp format_single_result_for_ai(result) when is_map(result) do
-    case result do
-      %{name: name, type: "Person"} = person ->
-        base = "#{name}"
+    # Handle both string and atom keys from Neo4j
+    name = get_value(result, ["name", :name])
+    type = get_value(result, ["type", :type])
+
+    case {name, type} do
+      {name, "Person"} when is_binary(name) ->
+        base = "Person name: #{name}"
 
         details =
           []
-          |> maybe_add_detail(person, :birth_date, "born")
-          |> maybe_add_detail(person, :death_date, "died")
-          |> maybe_add_detail(person, :biography, "bio")
-          |> maybe_add_detail(person, :hobbies, "hobbies")
+          |> maybe_add_detail_flexible(result, ["birth_date", :birth_date], "born")
+          |> maybe_add_detail_flexible(result, ["death_date", :death_date], "died")
+          |> maybe_add_detail_flexible(result, ["biography", :biography, "bio", :bio], "bio")
+          |> maybe_add_detail_flexible(result, ["hobbies", :hobbies], "hobbies")
 
         if Enum.empty?(details) do
           base
@@ -201,7 +206,8 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
         end
 
       _ ->
-        inspect(result)
+        # Fallback: try to extract meaningful info from any map structure
+        format_generic_result(result)
     end
   end
 
@@ -209,11 +215,46 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
     inspect(result)
   end
 
-  defp maybe_add_detail(details, person, key, label) do
-    case Map.get(person, key) do
+  # Helper function to get value from map with multiple possible keys
+  defp get_value(map, keys) when is_list(keys) do
+    Enum.find_value(keys, fn key ->
+      Map.get(map, key)
+    end)
+  end
+
+  # Flexible version that tries multiple key formats
+  defp maybe_add_detail_flexible(details, person, keys, label) when is_list(keys) do
+    case get_value(person, keys) do
       nil -> details
       "" -> details
       value -> details ++ ["#{label}: #{value}"]
+    end
+  end
+
+  # Format any generic result that doesn't match Person pattern
+  defp format_generic_result(result) when is_map(result) do
+    # Try to find a name or identifier
+    name = get_value(result, ["name", :name, "title", :title, "id", :id])
+
+    if name do
+      # Build a description from available fields
+      other_fields =
+        result
+        |> Map.drop(["name", :name, "type", :type])
+        |> Enum.map(fn {key, value} -> "#{key}: #{value}" end)
+        |> Enum.take(3)  # Limit to avoid too much text
+
+      if Enum.empty?(other_fields) do
+        "#{name}"
+      else
+        "#{name} (#{Enum.join(other_fields, ", ")})"
+      end
+    else
+      # No clear identifier, just show key info
+      result
+      |> Enum.take(3)
+      |> Enum.map(fn {key, value} -> "#{key}: #{value}" end)
+      |> Enum.join(", ")
     end
   end
 
