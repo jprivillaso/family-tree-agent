@@ -184,35 +184,68 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
   end
 
   defp format_single_result_for_ai(result) when is_map(result) do
-    # Handle both string and atom keys from Neo4j
-    name = get_value(result, ["name", :name])
-    type = get_value(result, ["type", :type])
+    # Handle path query results specially
+    cond do
+      Map.has_key?(result, "path") and Map.has_key?(result, "relationship_types") ->
+        format_path_result(result)
 
-    case {name, type} do
-      {name, "Person"} when is_binary(name) ->
-        base = "Person name: #{name}"
+      true ->
+        # Handle both string and atom keys from Neo4j
+        name = get_value(result, ["name", :name])
+        type = get_value(result, ["type", :type])
 
-        details =
-          []
-          |> maybe_add_detail_flexible(result, ["birth_date", :birth_date], "born")
-          |> maybe_add_detail_flexible(result, ["death_date", :death_date], "died")
-          |> maybe_add_detail_flexible(result, ["biography", :biography, "bio", :bio], "bio")
-          |> maybe_add_detail_flexible(result, ["hobbies", :hobbies], "hobbies")
+        case {name, type} do
+          {name, "Person"} when is_binary(name) ->
+            base = "Person name: #{name}"
 
-        if Enum.empty?(details) do
-          base
-        else
-          "#{base} (#{Enum.join(details, ", ")})"
+            details =
+              []
+              |> maybe_add_detail_flexible(result, ["birth_date", :birth_date], "born")
+              |> maybe_add_detail_flexible(result, ["death_date", :death_date], "died")
+              |> maybe_add_detail_flexible(result, ["biography", :biography, "bio", :bio], "bio")
+              |> maybe_add_detail_flexible(result, ["hobbies", :hobbies], "hobbies")
+
+            if Enum.empty?(details) do
+              base
+            else
+              "#{base} (#{Enum.join(details, ", ")})"
+            end
+
+          _ ->
+            # Fallback: try to extract meaningful info from any map structure
+            format_generic_result(result)
         end
-
-      _ ->
-        # Fallback: try to extract meaningful info from any map structure
-        format_generic_result(result)
     end
   end
 
   defp format_single_result_for_ai(result) do
     inspect(result)
+  end
+
+  # Format path query results (relationship between two people)
+  defp format_path_result(%{"path" => path, "relationship_types" => rel_types, "path_length" => length}) do
+    # Extract person names from path (skip relationship objects which are empty maps)
+    people =
+      path
+      |> Enum.filter(fn item -> is_map(item) and Map.has_key?(item, "name") end)
+      |> Enum.map(fn person -> person["name"] end)
+
+    case {people, rel_types} do
+      {[person1, person2], ["PARENT_OF"]} ->
+        "#{person1} is the parent of #{person2}"
+
+      {[person1, person2, person3], ["PARENT_OF", "PARENT_OF"]} ->
+        "#{person1} is the grandparent of #{person3} (through #{person2})"
+
+      {people_list, rel_list} when length(people_list) >= 2 ->
+        first_person = List.first(people_list)
+        last_person = List.last(people_list)
+        rel_description = Enum.join(rel_list, " -> ")
+        "#{first_person} is connected to #{last_person} through: #{rel_description} (#{length} steps)"
+
+      _ ->
+        "Relationship path found with #{length} steps: #{Enum.join(rel_types, " -> ")}"
+    end
   end
 
   # Helper function to get value from map with multiple possible keys

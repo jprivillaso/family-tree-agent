@@ -114,9 +114,13 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
         WHERE uncle_aunt <> parent
         RETURN DISTINCT cousin
 
-    13. Find relationship path between two people:
+    13. Find relationship path between two people (CRITICAL - copy this EXACTLY):
         MATCH path = shortestPath((p1:Person {name: "Joao Rivillas de Magalhaes"})-[*1..6]-(p2:Person {name: "David Rivillas de Magalhaes"}))
         RETURN path, [r in relationships(path) | type(r)] as relationship_types, length(path) as path_length
+
+    13b. Alternative relationship path query (CRITICAL - copy this EXACTLY):
+        MATCH path = shortestPath((p1:Person {name: "Cleolice Magalhaes de Souza Lima"})-[*1..4]-(p2:Person {name: "Joao Rivillas de Magalhaes"}))
+        RETURN nodes(path) as people, relationships(path) as rels, [r in relationships(path) | type(r)] as rel_types
 
     14. Find in-laws (spouse's family):
         MATCH (person:Person {name: "Juan Pablo Rivillas Ospina"})-[:MARRIED_TO]-(spouse:Person)
@@ -161,7 +165,7 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
     5. For "ancestors" queries, use recursive patterns like [:PARENT_OF*1..10] to go up the family tree
     6. For "descendants" queries, use recursive patterns to go down the family tree
     7. For "siblings" queries, find shared parents using the pattern shown in example 6
-    8. For "relationship between X and Y" queries, use shortestPath to find connections
+    8. For "relationship between X and Y" queries, ALWAYS use shortestPath (spelled correctly!) with the exact pattern from example 13 or 13b
     9. Use exact name matching when full names are provided
     10. Use CONTAINS for partial name matching
     11. Always include DISTINCT when using path queries to avoid duplicates
@@ -181,5 +185,9 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
     |> String.replace(~r/^```\s*/, "")
     |> String.replace(~r/```$/, "")
     |> String.trim()
+    # Fix common typos
+    |> String.replace("shortesstPath", "shortestPath")
+    |> String.replace("shorttestPath", "shortestPath")
+    |> String.replace("shortesPath", "shortestPath")
   end
 end
