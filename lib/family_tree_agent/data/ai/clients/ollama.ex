@@ -10,7 +10,7 @@ defmodule FamilyTreeAgent.AI.Clients.Ollama do
 
   # Default model configurations
   @default_embedding_model "nomic-embed-text"
-  @default_chat_model "llama3.2"
+  @default_chat_model "gemma3n:latest"
   @default_base_url "http://localhost:11434"
 
   @type t :: %__MODULE__{
@@ -96,8 +96,8 @@ defmodule FamilyTreeAgent.AI.Clients.Ollama do
       stream: false,
       options: %{
         temperature: 0.1,
-        # Limit response length
-        num_predict: 100
+        # Allow longer responses for detailed family information
+        num_predict: 500
       }
     }
 

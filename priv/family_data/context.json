@@ -8,7 +8,7 @@
       "relationships": {
         "spouse": "Alessandra Magalhaes de Souza Lima",
         "children": ["Joao Rivillas de Magalhaes", "David Rivillas de Magalhaes"],
-        "parents": ["Rolsalba del Consuelo Ospina Montoya", "Tulio Mario Rivillas Zapata"]
+        "parents": ["Rosalba del Consuelo Ospina Montoya", "Tulio Mario Rivillas Zapata"]
       },
       "metadata": {
         "occupation": "Software Engineer",
@@ -57,12 +57,12 @@
       }
     },
     {
-      "name": "Rolsalba del Consuelo Ospina Montoya",
+      "name": "Rosalba del Consuelo Ospina Montoya",
       "birth_date": "1956-07-24",
       "death_date": null,
       "bio": "Dedicated mother and daughter. Strong woman who raised three boys on her own for many years. Loves a crossword puzzle, reading the three musketeers and enjoying a cup of coffee in the morning.",
       "relationships": {
-        "children": ["Juan Pablo Rivillas Ospina", "Alessandra Magalhaes de Souza Lima"]
+        "children": ["Juan Pablo Rivillas Ospina"]
       },
       "metadata": {
         "occupation": "None",
@@ -96,11 +96,26 @@
       }
     },
     {
+      "name": "Evaldo de Souza Lima",
+      "birth_date": "1945-03-15",
+      "death_date": null,
+      "bio": "Hardworking father and husband. Dedicated his life to providing for his family. Known for his wisdom and quiet strength. Enjoys spending time with his grandchildren and sharing stories of his youth.",
+      "relationships": {
+        "spouse": "Cleolice Magalhaes de Souza Lima",
+        "children": ["Izabela Magalhaes de Souza Lima", "Alessandra Magalhaes de Souza Lima"]
+      },
+      "metadata": {
+        "occupation": "Retired Engineer",
+        "location": "Belo Horizonte, Brazil"
+      }
+    },
+    {
       "name": "Cleolice Magalhaes de Souza Lima",
       "birth_date": "1948-06-29",
       "death_date": null,
       "bio": "The biggest hearh in the family. She loves sitting on the kitchen's table and talk with whomever is there. Give her a cup of coffee and a slice of cheese and you'll have the best friend you ever need. Loves fishing and traveling with her family. Spends her day chasing her grandchildren, Joao and David.",
       "relationships": {
+        "spouse": "Evaldo de Souza Lima",
         "children": ["Izabela Magalhaes de Souza Lima", "Alessandra Magalhaes de Souza Lima"]
       },
       "metadata": {

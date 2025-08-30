@@ -154,7 +154,7 @@ defmodule FamilyTreeAgent.Data.Neo4jSeeder do
     # Convert properties to Cypher format
     props_string =
       properties
-      |> Enum.map(fn {key, value} -> "#{key}: $#{key}" end)
+      |> Enum.map(fn {key, _value} -> "#{key}: $#{key}" end)
       |> Enum.join(", ")
 
     cypher = "CREATE (p:Person {#{props_string}})"
