@@ -60,6 +60,8 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
 
     Smart Query Patterns (Derive Complex Relationships from Basic Ones):
 
+    For all the examples below, update the names to the ones you need.
+
     1. Find a person by name (exact match):
        MATCH (p:Person {name: "Juan Pablo Rivillas Ospina"}) RETURN p
 
@@ -76,10 +78,9 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
        MATCH (p1:Person {name: "Juan Pablo Rivillas Ospina"})-[:MARRIED_TO]-(p2:Person) RETURN p2
 
     6. Find siblings (children of same parents):
-       MATCH (person:Person {name: "Joao Rivillas de Magalhaes"})<-[:PARENT_OF]-(parent:Person)
-       MATCH (parent)-[:PARENT_OF]->(sibling:Person)
+       MATCH (person:Person {name: "David Rivillas de Magalhaes"})<-[:PARENT_OF]-(parent:Person)-[:PARENT_OF]->(sibling:Person)
        WHERE sibling <> person
-       RETURN DISTINCT sibling
+       RETURN DISTINCT sibling.name
 
     7. Find grandparents (parents of parents):
        MATCH (grandparent:Person)-[:PARENT_OF*2]->(grandchild:Person {name: "Joao Rivillas de Magalhaes"})
@@ -114,11 +115,11 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
         WHERE uncle_aunt <> parent
         RETURN DISTINCT cousin
 
-    13. Find relationship path between two people (CRITICAL - copy this EXACTLY):
+    13. Find relationship path between two people (CRITICAL - use EXACTLY this format):
         MATCH path = shortestPath((p1:Person {name: "Joao Rivillas de Magalhaes"})-[*1..6]-(p2:Person {name: "David Rivillas de Magalhaes"}))
         RETURN path, [r in relationships(path) | type(r)] as relationship_types, length(path) as path_length
 
-    13b. Alternative relationship path query (CRITICAL - copy this EXACTLY):
+    13b. Alternative relationship path query (CRITICAL - use EXACTLY this format):
         MATCH path = shortestPath((p1:Person {name: "Cleolice Magalhaes de Souza Lima"})-[*1..4]-(p2:Person {name: "Joao Rivillas de Magalhaes"}))
         RETURN nodes(path) as people, relationships(path) as rels, [r in relationships(path) | type(r)] as rel_types
 
@@ -161,16 +162,18 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
     1. Convert the natural language query to a valid Cypher query
     2. Return ONLY the Cypher query, no explanations or markdown
     3. Use proper Cypher syntax
-    4. For relationship queries, use smart path traversal patterns from the examples above
-    5. For "ancestors" queries, use recursive patterns like [:PARENT_OF*1..10] to go up the family tree
-    6. For "descendants" queries, use recursive patterns to go down the family tree
-    7. For "siblings" queries, find shared parents using the pattern shown in example 6
-    8. For "relationship between X and Y" queries, ALWAYS use shortestPath (spelled correctly!) with the exact pattern from example 13 or 13b
-    9. Use exact name matching when full names are provided
-    10. Use CONTAINS for partial name matching
-    11. Always include DISTINCT when using path queries to avoid duplicates
-    12. Return relevant properties (name, birth_date, death_date, bio, occupation, location)
-    13. Limit results to 20 items maximum using LIMIT 20
+    4. CRITICAL: Extract the EXACT person name from the natural language query and use it in your Cypher query
+    5. For relationship queries, use smart path traversal patterns from the examples above
+    6. For "ancestors" queries, use recursive patterns like [:PARENT_OF*1..10] to go up the family tree
+    7. For "descendants" queries, use recursive patterns to go down the family tree
+    8. For "siblings" queries, find shared parents using the pattern shown in example 6 - MAKE SURE to use the person name from the question
+    9. For "relationship between X and Y" queries, ALWAYS use shortestPath (spelled correctly!) with the exact pattern from example 13 or 13b
+    10. Use exact name matching when full names are provided in the question
+    11. Use CONTAINS for partial name matching when only partial names are provided
+    12. Always include DISTINCT when using path queries to avoid duplicates
+    13. Return relevant properties (name, birth_date, death_date, bio, occupation, location)
+    14. Limit results to 20 items maximum using LIMIT 20
+    15. DOUBLE-CHECK: Make sure the person name in your Cypher query matches the person name mentioned in the natural language question
 
     Natural Language Query: #{natural_language_query}
 
@@ -189,5 +192,13 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
     |> String.replace("shortesstPath", "shortestPath")
     |> String.replace("shorttestPath", "shortestPath")
     |> String.replace("shortesPath", "shortestPath")
+    # Fix missing closing parenthesis in sibling queries
+    |> fix_sibling_query_syntax()
+  end
+
+  defp fix_sibling_query_syntax(query) do
+    # Fix pattern: {name: "Name"}<-[:PARENT_OF] should be {name: "Name"})<-[:PARENT_OF]
+    query
+    |> String.replace(~r/\{name:\s*"([^"]+)"\}<-\[:PARENT_OF\]/, "{name: \"\\1\"})<-[:PARENT_OF]")
   end
 end
