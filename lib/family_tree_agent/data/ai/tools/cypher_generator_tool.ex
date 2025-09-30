@@ -34,7 +34,7 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
   def generate_cypher(%__MODULE__{} = tool, natural_language_query) do
     prompt = build_cypher_prompt(tool.schema_context, natural_language_query)
 
-    case OllamaClient.generate_text(tool.ai_client, prompt) do
+    case tool.ai_client.__struct__.generate_text(tool.ai_client, prompt) do
       {:ok, cypher_query} ->
         cleaned_query = clean_cypher_query(cypher_query)
         {:ok, cleaned_query}

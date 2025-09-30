@@ -60,6 +60,24 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# AI Client Configuration
+config :family_tree_agent,
+  # Default AI client type (:openai or :ollama)
+  ai_client_type: :openai,
+  # Client-specific configurations
+  ai_clients: [
+    openai: [
+      # API key will be read from OPENAI_API_KEY environment variable
+      embedding_model: "text-embedding-3-small",
+      chat_model: "gpt-4o-mini"
+    ],
+    ollama: [
+      base_url: "http://localhost:11434",
+      embedding_model: "nomic-embed-text",
+      chat_model: "gemma3n:latest"
+    ]
+  ]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

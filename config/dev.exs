@@ -74,8 +74,10 @@ config :phoenix_live_view,
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
 
-# OpenAI configuration
-config :family_tree_agent, :openai, api_key: System.get_env("OPENAI_API_KEY")
+# AI Client Configuration for Development
+# You can override the client type here for local development
+# Uncomment the line below to use Ollama locally:
+# config :family_tree_agent, ai_client_type: :ollama
 
 # Import secret configuration (if it exists)
 if File.exists?("config/dev_secret.exs") do
