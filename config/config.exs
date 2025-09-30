@@ -78,6 +78,12 @@ config :family_tree_agent,
     ]
   ]
 
+# API Authentication Configuration
+# In production, set these environment variables:
+# - FAMILY_TREE_API_USERNAME
+# - FAMILY_TREE_API_PASSWORD
+# If not set, authentication is disabled (useful for development)
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
