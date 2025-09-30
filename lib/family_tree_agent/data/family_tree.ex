@@ -11,8 +11,8 @@ defmodule FamilyTreeAgent.Data.FamilyTree do
   require Logger
 
   @doc """
-  Fetches all family members with their children relationships.
-  Returns a simplified structure suitable for building hierarchies in the frontend.
+  Fetches all family members with their relationships (children and spouse).
+  Returns a comprehensive structure suitable for building family trees in the frontend.
   """
   @spec get_all_members() :: {:ok, list(map())} | {:error, String.t()}
   def get_all_members do
@@ -20,13 +20,16 @@ defmodule FamilyTreeAgent.Data.FamilyTree do
 
     cypher_query = """
     MATCH (p:Person)
-    OPTIONAL MATCH (p)-[r:PARENT_OF]->(child:Person)
+    OPTIONAL MATCH (p)-[:PARENT_OF]->(child:Person)
+    OPTIONAL MATCH (p)-[:MARRIED_TO]-(spouse:Person)
     RETURN p.name as name,
            p.birth_date as birth_date,
            p.death_date as death_date,
-           p.biography as biography,
            p.bio as bio,
-           collect(DISTINCT child.name) as children
+           p.occupation as occupation,
+           p.location as location,
+           collect(DISTINCT child.name) as children,
+           spouse.name as spouse
     ORDER BY p.name
     """
 
@@ -80,8 +83,11 @@ defmodule FamilyTreeAgent.Data.FamilyTree do
       name: get_string_value(member_data, "name"),
       birth_date: get_string_value(member_data, "birth_date"),
       death_date: get_string_value(member_data, "death_date"),
-      biography: get_string_value(member_data, "biography") || get_string_value(member_data, "bio"),
-      children: clean_list_value(member_data, "children")
+      biography: get_string_value(member_data, "bio"),
+      occupation: get_string_value(member_data, "occupation"),
+      location: get_string_value(member_data, "location"),
+      children: clean_list_value(member_data, "children"),
+      spouse: get_string_value(member_data, "spouse")
     }
     |> remove_nil_values()
   end
