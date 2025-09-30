@@ -38,3 +38,4 @@ kill_signal = 'SIGTERM'
 [mounts]
   source = 'neo4j_data'
   destination = '/data'
+  initial_size = '1gb'

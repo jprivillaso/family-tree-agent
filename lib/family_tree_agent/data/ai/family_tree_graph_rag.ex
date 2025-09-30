@@ -13,7 +13,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
 
   @behaviour FamilyTreeAgent.AI.Clients.PlannerBehavior
 
-  alias FamilyTreeAgent.AI.Clients.Ollama, as: OllamaClient
+  alias FamilyTreeAgent.AI.ClientFactory
   alias FamilyTreeAgent.AI.Tools.CypherGeneratorTool
   alias FamilyTreeAgent.AI.Tools.Neo4jExecutorTool
 
@@ -35,7 +35,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
   def init(config \\ []) do
     Logger.info("🔧 Initializing FamilyTreeGraphRAG...")
 
-    with {:ok, ai_client} <- OllamaClient.init(config) do
+    with {:ok, ai_client} <- ClientFactory.create_client() do
       cypher_tool = CypherGeneratorTool.init(ai_client)
       neo4j_tool = Neo4jExecutorTool.init(config)
 
@@ -165,7 +165,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
     Response:
     """
 
-    case OllamaClient.generate_text(graph_rag.ai_client, prompt) do
+    case graph_rag.ai_client.__struct__.generate_text(graph_rag.ai_client, prompt) do
       {:ok, response} ->
         {:ok, String.trim(response)}
 
