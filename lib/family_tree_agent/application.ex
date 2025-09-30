@@ -9,7 +9,6 @@ defmodule FamilyTreeAgent.Application do
   def start(_type, _args) do
     children = [
       FamilyTreeAgentWeb.Telemetry,
-      FamilyTreeAgent.Repo,
       {DNSCluster, query: Application.get_env(:family_tree_agent, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: FamilyTreeAgent.PubSub},
       # Start the Finch HTTP client for sending emails
