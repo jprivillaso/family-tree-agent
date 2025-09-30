@@ -34,11 +34,9 @@ defmodule FamilyTreeAgentWeb.Router do
     scope "/family_members" do
       # AI-powered answer endpoints (protected)
       post "/answer", FamilyMemberController, :answer
-      options "/answer", FamilyMemberController, :options
 
       # Family tree endpoints (protected)
       get "/", FamilyMemberController, :family_members
-      options "/", FamilyMemberController, :options
     end
   end
 
