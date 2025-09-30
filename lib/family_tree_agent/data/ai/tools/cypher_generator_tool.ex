@@ -4,7 +4,7 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
   for family tree data stored in Neo4J.
   """
 
-  alias FamilyTreeAgent.AI.Clients.Ollama, as: OllamaClient
+  alias FamilyTreeAgent.AI.Clients.Client
 
   @type t :: %__MODULE__{
           ai_client: any(),
@@ -34,7 +34,7 @@ defmodule FamilyTreeAgent.AI.Tools.CypherGeneratorTool do
   def generate_cypher(%__MODULE__{} = tool, natural_language_query) do
     prompt = build_cypher_prompt(tool.schema_context, natural_language_query)
 
-    case tool.ai_client.__struct__.generate_text(tool.ai_client, prompt) do
+    case Client.generate_text(tool.ai_client, prompt) do
       {:ok, cypher_query} ->
         cleaned_query = clean_cypher_query(cypher_query)
         {:ok, cleaned_query}

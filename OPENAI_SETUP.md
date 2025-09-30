@@ -101,17 +101,17 @@ fly secrets set OPENAI_API_KEY="your-key"
 ### Manual Testing
 ```elixir
 # In iex -S mix
-alias FamilyTreeAgent.AI.ClientFactory
+alias FamilyTreeAgent.AI.Clients.Client
 
 # Create client
-{:ok, client} = ClientFactory.create_client()
+{:ok, client} = Client.create()
 
 # Test embedding
-embedding = client.__struct__.create_embedding(client, "Hello world")
+embedding = Client.create_embedding(client, "Hello world")
 IO.inspect(Nx.shape(embedding))
 
 # Test text generation
-{:ok, response} = client.__struct__.generate_text(client, "Who is Juan Pablo?")
+{:ok, response} = Client.generate_text(client, "Who is Juan Pablo?")
 IO.puts(response)
 ```
 
