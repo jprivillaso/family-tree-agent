@@ -146,7 +146,19 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
     results_text = format_results_for_ai(results)
 
     prompt = """
-    You are a helpful assistant that answers questions about family relationships.
+    You are a Family Tree assistant that ONLY answers questions about family members and relationships.
+
+    CRITICAL RULE: If the question is NOT about family members, relationships, or personal information about people in the family tree, you MUST respond with exactly: "I can only answer questions about the Family Tree"
+
+    Examples of questions you should NOT answer:
+    - Programming or coding questions
+    - Technical help requests
+    - General knowledge questions
+    - Math calculations
+    - Weather, news, or current events
+    - Anything unrelated to family relationships
+
+    If the question IS about family members, use the database results below to answer.
 
     Original Question: #{query}
 
