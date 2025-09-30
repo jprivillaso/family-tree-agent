@@ -7,7 +7,9 @@ defmodule FamilyTreeAgentWeb.HealthController do
 
   alias FamilyTreeAgent.RAGServer
   alias FamilyTreeAgent.Data.Neo4j
+  alias FamilyTreeAgent.AI.Clients.Client, as: AIClient
   alias FamilyTreeAgent.AI.Clients.Ollama
+  alias FamilyTreeAgent.AI.Clients.OpenAI
 
   require Logger
 
@@ -21,12 +23,12 @@ defmodule FamilyTreeAgentWeb.HealthController do
 
     # Check all components
     neo4j_status = get_neo4j_status()
-    ollama_status = get_ollama_status()
+    ai_client_status = get_ai_client_status()
     rag_status = get_rag_status()
 
     components = %{
       neo4j: neo4j_status,
-      ollama: ollama_status,
+      ai_client: ai_client_status,
       rag_system: rag_status
     }
 
@@ -68,42 +70,26 @@ defmodule FamilyTreeAgentWeb.HealthController do
     end
   end
 
+  defp get_ai_client_status do
+    client_type = AIClient.get_configured_client_type()
+
+    case client_type do
+      :ollama -> get_ollama_status()
+      :openai -> get_openai_status()
+      _ -> %{status: "unknown", message: "Unknown AI client type: #{client_type}"}
+    end
+  end
+
   defp get_ollama_status do
     try do
       # Create a temporary Ollama client to test connection
       case Ollama.init() do
-        {:ok, client} ->
-          case Ollama.list_models(client) do
-            {:ok, models} ->
-              required_models = ["nomic-embed-text", "gemma3n:latest"]
-              missing_models = required_models -- models
-
-              if Enum.empty?(missing_models) do
-                %{
-                  status: "healthy",
-                  message: "Ollama is running with all required models",
-                  url: "http://localhost:11434",
-                  models: models
-                }
-              else
-                %{
-                  status: "degraded",
-                  message: "Ollama is running but missing required models",
-                  url: "http://localhost:11434",
-                  models: models,
-                  missing_models: missing_models,
-                  help: "Run: ollama pull #{Enum.join(missing_models, " && ollama pull ")}"
-                }
-              end
-
-            {:error, reason} ->
-              %{
-                status: "degraded",
-                message: "Ollama is running but cannot list models",
-                url: "http://localhost:11434",
-                error: inspect(reason)
-              }
-          end
+        {:ok, _client} ->
+          %{
+            status: "healthy",
+            message: "Ollama is running",
+            url: "http://localhost:11434",
+          }
 
         {:error, reason} ->
           %{
@@ -121,6 +107,40 @@ defmodule FamilyTreeAgentWeb.HealthController do
           message: "Ollama health check failed",
           error: Exception.message(error),
           url: "http://localhost:11434"
+        }
+    end
+  end
+
+  defp get_openai_status do
+    try do
+      # Create a temporary OpenAI client to test connection
+      case OpenAI.init() do
+        {:ok, client} ->
+          %{
+            status: "healthy",
+            message: "OpenAI is running",
+            provider: "OpenAI",
+            embedding_model: client.embedding_model,
+            chat_model: client.chat_model
+          }
+
+        {:error, reason} ->
+          %{
+            status: "unhealthy",
+            message: "OpenAI connection failed",
+            error: inspect(reason),
+            provider: "OpenAI",
+            help: "Check OPENAI_API_KEY environment variable"
+          }
+      end
+    rescue
+      error ->
+        %{
+          status: "unhealthy",
+          message: "OpenAI connection failed",
+          error: Exception.message(error),
+          provider: "OpenAI",
+          help: "Verify API key and network connectivity"
         }
     end
   end

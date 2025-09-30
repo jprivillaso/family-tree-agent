@@ -14,19 +14,29 @@ defmodule FamilyTreeAgentWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :protected_api do
+    plug :accepts, ["json"]
+    plug FamilyTreeAgentWeb.Plugs.BasicAuth
+  end
+
   # Other scopes may use custom stacks.
   scope "/api", FamilyTreeAgentWeb do
     pipe_through :api
 
-    # Health check endpoint
+    # Health check endpoint (public)
     get "/health", HealthController, :health
+  end
+
+  # Protected API endpoints
+  scope "/api", FamilyTreeAgentWeb do
+    pipe_through :protected_api
 
     scope "/family_members" do
-      # AI-powered answer endpoints
+      # AI-powered answer endpoints (protected)
       post "/answer", FamilyMemberController, :answer
       options "/answer", FamilyMemberController, :options
 
-      # Family tree endpoints
+      # Family tree endpoints (protected)
       get "/", FamilyMemberController, :family_members
       options "/", FamilyMemberController, :options
     end
