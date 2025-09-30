@@ -286,7 +286,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
       other_fields =
         result
         |> Map.drop(["name", :name, "type", :type])
-        |> Enum.map(fn {key, value} -> "#{key}: #{value}" end)
+        |> Enum.map(fn {key, value} -> "#{key}: #{format_value_safely(value)}" end)
         |> Enum.take(3)  # Limit to avoid too much text
 
       if Enum.empty?(other_fields) do
@@ -298,10 +298,48 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
       # No clear identifier, just show key info
       result
       |> Enum.take(3)
-      |> Enum.map(fn {key, value} -> "#{key}: #{value}" end)
+      |> Enum.map(fn {key, value} -> "#{key}: #{format_value_safely(value)}" end)
       |> Enum.join(", ")
     end
   end
+
+  # Safely format any value for string interpolation
+  defp format_value_safely(value) when is_binary(value), do: value
+  defp format_value_safely(value) when is_number(value), do: to_string(value)
+  defp format_value_safely(value) when is_atom(value), do: to_string(value)
+  defp format_value_safely(value) when is_list(value) do
+    case value do
+      [] -> "[]"
+      list when length(list) <= 3 ->
+        list
+        |> Enum.map(&format_value_safely/1)
+        |> Enum.join(", ")
+        |> then(&"[#{&1}]")
+      list ->
+        list
+        |> Enum.take(3)
+        |> Enum.map(&format_value_safely/1)
+        |> Enum.join(", ")
+        |> then(&"[#{&1}...]")
+    end
+  end
+  defp format_value_safely(value) when is_map(value) do
+    # For maps, try to extract key information
+    cond do
+      Map.has_key?(value, "name") -> Map.get(value, "name")
+      Map.has_key?(value, :name) -> Map.get(value, :name)
+      Map.has_key?(value, "title") -> Map.get(value, "title")
+      Map.has_key?(value, :title) -> Map.get(value, :title)
+      true ->
+        # Fallback: show first few key-value pairs
+        value
+        |> Enum.take(2)
+        |> Enum.map(fn {k, v} -> "#{k}:#{format_value_safely(v)}" end)
+        |> Enum.join(",")
+        |> then(&"{#{&1}}")
+    end
+  end
+  defp format_value_safely(value), do: inspect(value, limit: 50)
 
   defp format_raw_results(results) when is_list(results) do
     results
