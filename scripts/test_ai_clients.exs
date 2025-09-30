@@ -8,7 +8,7 @@ Mix.install([
 ])
 
 defmodule AIClientTest do
-  alias FamilyTreeAgent.AI.ClientFactory
+  alias FamilyTreeAgent.AI.Clients.Client
 
   def run do
     IO.puts("🧪 Testing AI Client System")
@@ -27,9 +27,9 @@ defmodule AIClientTest do
   end
 
   defp test_client_info do
-    IO.puts("\n📋 Testing ClientFactory.client_info/0...")
+    IO.puts("\n📋 Testing Client.client_info/0...")
 
-    info = ClientFactory.client_info()
+    info = Client.client_info()
     IO.puts("Current client type: #{info.current_type}")
     IO.puts("Available types: #{inspect(info.available_types)}")
     IO.puts("Config: #{inspect(info.config)}")
@@ -39,10 +39,11 @@ defmodule AIClientTest do
     IO.puts("\n🏗️  Testing client creation...")
 
     # Test default client
-    case ClientFactory.create_client() do
+    case Client.create() do
       {:ok, client} ->
-        IO.puts("✅ Default client created: #{client.__struct__}")
-        client_info = client.__struct__.info(client)
+        provider = Client.provider(client)
+        IO.puts("✅ Default client created: #{provider}")
+        client_info = Client.info(client)
         IO.puts("   Provider: #{client_info.provider}")
         IO.puts("   Embedding model: #{client_info.embedding_model}")
         IO.puts("   Chat model: #{client_info.chat_model}")
@@ -52,8 +53,8 @@ defmodule AIClientTest do
     end
 
     # Test specific client types
-    for client_type <- ClientFactory.available_client_types() do
-      case ClientFactory.create_client(client_type) do
+    for client_type <- Client.available_client_types() do
+      case Client.create(client_type) do
         {:ok, client} ->
           IO.puts("✅ #{client_type} client created successfully")
 
@@ -66,7 +67,7 @@ defmodule AIClientTest do
   defp test_basic_functionality do
     IO.puts("\n🔧 Testing basic functionality...")
 
-    case ClientFactory.create_client() do
+    case Client.create() do
       {:ok, client} ->
         test_text = "Hello, this is a test."
 
@@ -74,7 +75,7 @@ defmodule AIClientTest do
 
         # Test embedding (should work for both clients)
         try do
-          embedding = client.__struct__.create_embedding(client, test_text)
+          embedding = Client.create_embedding(client, test_text)
           shape = Nx.shape(embedding)
           IO.puts("✅ Embedding created: #{inspect(shape)} tensor")
         rescue
@@ -84,7 +85,7 @@ defmodule AIClientTest do
 
         # Test text generation (might fail without proper setup)
         try do
-          case client.__struct__.generate_text(client, "What is 2+2?") do
+          case Client.generate_text(client, "What is 2+2?") do
             {:ok, response} ->
               IO.puts("✅ Text generation successful: #{String.slice(response, 0, 50)}...")
 
