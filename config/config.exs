@@ -8,7 +8,6 @@
 import Config
 
 config :family_tree_agent,
-  ecto_repos: [FamilyTreeAgent.Repo],
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint

@@ -21,16 +21,15 @@ defmodule FamilyTreeAgentWeb.Router do
     # Health check endpoint
     get "/health", HealthController, :health
 
-    resources "/family_members", FamilyMemberController, except: [:new, :edit]
+    scope "/family_members" do
+      # AI-powered answer endpoints
+      post "/answer", FamilyMemberController, :answer
+      options "/answer", FamilyMemberController, :options
 
-    # AI-powered answer endpoints
-    post "/family_members/answer_general", FamilyMemberController, :answer_general
-
-    # OPTIONS routes for CORS support
-    options "/family_members", FamilyMemberController, :options
-    options "/family_members/:id", FamilyMemberController, :options
-    options "/family_members/answer", FamilyMemberController, :options
-    options "/family_members/answer_general", FamilyMemberController, :options
+      # Family tree endpoints
+      get "/", FamilyMemberController, :family_members
+      options "/", FamilyMemberController, :options
+    end
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

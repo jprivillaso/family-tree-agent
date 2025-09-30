@@ -7,8 +7,11 @@ defmodule FamilyTreeAgent.Data.Neo4j do
 
   require Logger
 
-  @base_url "http://localhost:7474"
   @auth_header "Basic " <> Base.encode64("neo4j:familytree123")
+
+  defp base_url do
+    Application.get_env(:family_tree_agent, :neo4j_url, "http://localhost:7474")
+  end
 
   @doc """
   Test the Neo4j connection via HTTP API.
@@ -16,7 +19,7 @@ defmodule FamilyTreeAgent.Data.Neo4j do
   def test_connection do
     try do
       # Use the root endpoint which we know works
-      case Req.get("#{@base_url}/", headers: [{"Authorization", @auth_header}]) do
+      case Req.get("#{base_url()}/", headers: [{"Authorization", @auth_header}]) do
         {:ok, %{status: 200} = response} ->
           Logger.info("Neo4j HTTP connection test successful")
           {:ok, response.body}
@@ -51,7 +54,7 @@ defmodule FamilyTreeAgent.Data.Neo4j do
         ]
       }
 
-      case Req.post("#{@base_url}/db/neo4j/tx/commit",
+      case Req.post("#{base_url()}/db/neo4j/tx/commit",
              json: body,
              headers: [{"Authorization", @auth_header}, {"Content-Type", "application/json"}]
            ) do
