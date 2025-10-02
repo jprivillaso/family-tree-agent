@@ -133,6 +133,7 @@ defmodule FamilyTreeAgent.Data.Neo4jSeeder do
     birth_date = Map.get(member, "birth_date")
     death_date = Map.get(member, "death_date")
     bio = Map.get(member, "bio", "")
+    gender = Map.get(member, "gender", "")
 
     # Extract metadata
     metadata = Map.get(member, "metadata", %{})
@@ -144,6 +145,7 @@ defmodule FamilyTreeAgent.Data.Neo4jSeeder do
       name: name,
       birth_date: birth_date,
       bio: bio,
+      gender: gender,
       occupation: occupation,
       location: location
     }
@@ -174,17 +176,17 @@ defmodule FamilyTreeAgent.Data.Neo4jSeeder do
     name = Map.get(member, "name")
     relationships = Map.get(member, "relationships", %{})
 
-    # Create parent relationships
-    case create_parent_relationships(name, relationships) do
+    # Create parent-child relationships (this person as parent)
+    case create_children_relationships(name, relationships) do
       :ok -> create_spouse_relationships(name, relationships)
       error -> error
     end
   end
 
-  defp create_parent_relationships(child_name, relationships) do
-    parents = Map.get(relationships, "parents", [])
+  defp create_children_relationships(parent_name, relationships) do
+    children = Map.get(relationships, "children", [])
 
-    Enum.reduce_while(parents, :ok, fn parent_name, _acc ->
+    Enum.reduce_while(children, :ok, fn child_name, _acc ->
       case create_parent_child_relationship(parent_name, child_name) do
         :ok -> {:cont, :ok}
         error -> {:halt, error}

@@ -2,13 +2,13 @@
   "family_members": [
     {
       "name": "Juan Pablo Rivillas Ospina",
-      "birth_date": "1991-11-18",
+      "birth_date": "11-18-1991",
       "death_date": null,
-      "bio": "Loves to travel with his family, learn about new technologies and write in his blog. He's originally from Colombia but moved to Brazil in 2013. After that, has has lived in the United States for a year and today he spends most of the time with his family in their beach house in Sao Miguel dos Milagres. Coffee lover, tail teller and a very empathetic person. His family is his everything.",
+      "bio": "Loves to travel with his family, learn about new languages and write about technology. He's originally from Colombia but moved to Brazil in 2013. He spends most of the time with his family in their beach house in Sao Miguel dos Milagres. Coffee lover, tail teller and a very empathetic person. His family is his everything.",
+      "gender": "male",
       "relationships": {
         "spouse": "Alessandra Magalhaes de Souza Lima",
-        "children": ["Joao Rivillas de Magalhaes", "David Rivillas de Magalhaes"],
-        "parents": ["Rosalba del Consuelo Ospina Montoya", "Tulio Mario Rivillas Zapata"]
+        "children": ["Joao Rivillas de Magalhaes", "David Rivillas de Magalhaes"]
       },
       "metadata": {
         "occupation": "Software Engineer",
@@ -17,13 +17,13 @@
     },
     {
       "name": "Alessandra Magalhaes de Souza Lima",
-      "birth_date": "1985-12-05",
+      "birth_date": "12-05-1985",
       "death_date": null,
-      "bio": "Passionate mother. Loves to spend time with her family, traveling and discovering new places in the nature. She's a natural dreamer. What she visions, she makes happen. Dedicated mother and wife. A woman that conquers anybody's heart with her smile, kindness and contagious laugh.",
+      "bio": "Passionate mother. Loves to spend time with her family, traveling and discovering new places in the nature. She's a natural dreamer. What she visions, she makes it happen. Dedicated mother and wife. A woman that conquers anybody's heart with her smile, kindness and contagious laugh.",
+      "gender": "female",
       "relationships": {
         "spouse": "Juan Pablo Rivillas Ospina",
-        "children": ["Joao Rivillas de Magalhaes", "David Rivillas de Magalhaes"],
-        "parents": ["Cleolice Magalhaes de Souza Lima", "Evaldo de Souza Lima"]
+        "children": ["Joao Rivillas de Magalhaes", "David Rivillas de Magalhaes"]
       },
       "metadata": {
         "occupation": "Lawyer",
@@ -32,12 +32,10 @@
     },
     {
       "name": "Joao Rivillas de Magalhaes",
-      "birth_date": "2021-06-11",
+      "birth_date": "06-11-2021",
       "death_date": null,
-      "bio": "A very curious child. Loves to ride his bike with his brother David, go to the beach to grab crabs and travel with his family. The world is his home.",
-      "relationships": {
-        "parents": ["Juan Pablo Rivillas Ospina", "Alessandra Magalhaes de Souza Lima"]
-      },
+      "bio": "A very curious child. Loves to ride his bike with his brother David. He loves to build legos, unmount cards and a screwdriver to see how things are built up. The world is his home.",
+      "gender": "male",
       "metadata": {
         "occupation": "None",
         "location": "Belo Horizonte, Brazil"
@@ -45,12 +43,10 @@
     },
     {
       "name": "David Rivillas de Magalhaes",
-      "birth_date": "2022-07-22",
+      "birth_date": "07-22-2022",
       "death_date": null,
-      "bio": "Funniest child. Loves to ride his bike with his brother Joao, go to the beach to grab crabs. He loves animals and loves any adventure with his brother. He's very smart and loves to explore the nature, ask questions and look at the sky.",
-      "relationships": {
-        "parents": ["Juan Pablo Rivillas Ospina", "Alessandra Magalhaes de Souza Lima"]
-      },
+      "bio": "Funniest child. Loves to ride his scooter with his brother Joao and go to the beach to grab crabs. He loves animals and loves any adventure with his brother. He's very smart and loves to explore the nature, ask questions and look at the sky.",
+      "gender": "male",
       "metadata": {
         "occupation": "None",
         "location": "Belo Horizonte, Brazil"
@@ -58,38 +54,38 @@
     },
     {
       "name": "Rosalba del Consuelo Ospina Montoya",
-      "birth_date": "1956-07-24",
+      "birth_date": "07-24-1956",
       "death_date": null,
       "bio": "Dedicated mother and daughter. Strong woman who raised three boys on her own for many years. Loves a crossword puzzle, reading the three musketeers and enjoying a cup of coffee in the morning.",
+      "gender": "female",
       "relationships": {
-        "children": ["Juan Pablo Rivillas Ospina"]
+        "children": ["Juan Pablo Rivillas Ospina", "German Daniel Rivillas Ospina", "Jhon Mario Rivillas Ospina"]
       },
       "metadata": {
-        "occupation": "None",
-        "location": "Rionegro, Antioquia, Colombia"
+        "occupation": "Caregiver",
+        "location": "Rionegro, Colombia"
       }
     },
     {
       "name": "Tulio Mario Rivillas Zapata",
-      "birth_date": "1953-02-03",
+      "birth_date": "02-03-1953",
       "death_date": null,
       "bio": "Thing of a tough, hardworking person. Dedicated his life to his family. Moved to the US many years ago to provide for his family. Endured the hardest challenges in life, fell countless times, and never gave up. Today he lives in the US with his wife and daughter.",
+      "gender": "male",
       "relationships": {
         "children": ["Juan Pablo Rivillas Ospina", "German Daniel Rivillas Ospina", "Jhon Mario Rivillas Ospina"]
       },
       "metadata": {
         "occupation": "Driver",
-        "location": "Adisson, IL, United States"
+        "location": "Adisson, United States"
       }
     },
     {
       "name": "Izabela Magalhaes de Souza Lima",
-      "birth_date": "1990-08-10",
+      "birth_date": "10-08-1990",
       "death_date": null,
       "bio": "A very special person. She loves painting, reading, and spending time near her family. The most empathetic person in the family. She unites everyone with her smile and her kindness. Spends her day chasing her nephews, Joao and David, as well as enduring his brother in law Juan Pablo.",
-      "relationships": {
-        "parents": ["Cleolice Magalhaes de Souza Lima", "Evaldo de Souza Lima"]
-      },
+      "gender": "female",
       "metadata": {
         "occupation": "None",
         "location": "Belo Horizonte, Brazil"
@@ -97,9 +93,10 @@
     },
     {
       "name": "Evaldo de Souza Lima",
-      "birth_date": "1951-03-15",
+      "birth_date": "03-15-1951",
       "death_date": null,
       "bio": "Hardworking father and husband. Dedicated his life to providing for his family. Known for his wisdom and quiet strength. Enjoys spending time with his grandchildren and sharing stories of his youth.",
+      "gender": "male",
       "relationships": {
         "children": ["Izabela Magalhaes de Souza Lima", "Alessandra Magalhaes de Souza Lima"]
       },
@@ -110,15 +107,104 @@
     },
     {
       "name": "Cleolice Magalhaes de Souza Lima",
-      "birth_date": "1948-06-29",
+      "birth_date": "06-29-1948",
       "death_date": null,
       "bio": "The biggest hearh in the family. She loves sitting on the kitchen's table and talk with whomever is there. Give her a cup of coffee and a slice of cheese and you'll have the best friend you ever need. Loves fishing and traveling with her family. Spends her day chasing her grandchildren, Joao and David.",
+      "gender": "female",
       "relationships": {
         "children": ["Izabela Magalhaes de Souza Lima", "Alessandra Magalhaes de Souza Lima"]
       },
       "metadata": {
         "occupation": "Retired Lawyer",
         "location": "Belo Horizonte, Brazil"
+      }
+    },
+    {
+      "name": "Moacyr Argemiro de Magalhaes",
+      "birth_date": "06-10-1912",
+      "death_date": "03-03-1978",
+      "bio": "",
+      "gender": "male",
+      "relationships": {
+        "spouse": "Florentina Corrêa de Magalhaes",
+        "children": ["Cleolice Magalhaes de Souza Lima"]
+      },
+      "metadata": {
+        "occupation": "Farmer",
+        "location": "Corinto, Brazil"
+      }
+    },
+    {
+      "name": "Florentina Corrêa de Magalhaes",
+      "birth_date": "09-17-1917",
+      "death_date": null,
+      "bio": "",
+      "gender": "female",
+      "relationships": {
+        "spouse": "Moacyr Argemiro de Magalhaes",
+        "children": ["Cleolice Magalhaes de Souza Lima"]
+      },
+      "metadata": {
+        "occupation": "Farmer",
+        "location": "Corinto, Brazil"
+      }
+    },
+    {
+      "name": "German Daniel Rivillas Ospina",
+      "birth_date": "05-04-1980",
+      "bio": "",
+      "gender": "male",
+      "relationships": {
+        "spouse": "Diana Marcela Cardona Garcia",
+        "children": ["Sebastian Rivillas Cardona", "Santiago Rivillas Cardona"]
+      },
+      "metadata": {
+        "occupation": "Ph.d Civil Engineer",
+        "location": "Barranquilla, Colombia"
+      }
+    },
+    {
+      "name": "Jhon Mario Rivillas Ospina",
+      "birth_date": "02-05-1981",
+      "bio": "",
+      "gender": "male",
+        "metadata": {
+        "occupation": "Electrical Engineer",
+        "location": "Medellin, Colombia"
+      }
+    },
+    {
+      "name": "Diana Marcela Cardona Garcia",
+      "birth_date": "09-19-1980",
+      "bio": "",
+      "gender": "female",
+      "relationships": {
+        "spouse": "German Daniel Rivillas Ospina",
+        "children": ["Sebastian Rivillas Cardona", "Santiago Rivillas Cardona"]
+      },
+      "metadata": {
+        "occupation": "Teacher",
+        "location": "Rionegro, Colombia"
+      }
+    },
+    {
+      "name": "Sebastian Rivillas Cardona",
+      "birth_date": "05-21-2001",
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "Student",
+        "location": "Medellin, Colombia"
+      }
+    },
+    {
+      "name": "Santiago Rivillas Cardona",
+      "birth_date": "01-13-2009",
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "Student",
+        "location": "Barranquilla, Colombia"
       }
     }
   ]
