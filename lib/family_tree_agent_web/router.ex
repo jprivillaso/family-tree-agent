@@ -14,23 +14,30 @@ defmodule FamilyTreeAgentWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :protected_api do
+    plug :accepts, ["json"]
+    plug FamilyTreeAgentWeb.Plugs.BasicAuth
+  end
+
   # Other scopes may use custom stacks.
   scope "/api", FamilyTreeAgentWeb do
     pipe_through :api
 
-    # Health check endpoint
+    # Health check endpoint (public)
     get "/health", HealthController, :health
+  end
 
-    resources "/family_members", FamilyMemberController, except: [:new, :edit]
+  # Protected API endpoints
+  scope "/api", FamilyTreeAgentWeb do
+    pipe_through :protected_api
 
-    # AI-powered answer endpoints
-    post "/family_members/answer_general", FamilyMemberController, :answer_general
+    scope "/family_members" do
+      # AI-powered answer endpoints (protected)
+      post "/answer", FamilyMemberController, :answer
 
-    # OPTIONS routes for CORS support
-    options "/family_members", FamilyMemberController, :options
-    options "/family_members/:id", FamilyMemberController, :options
-    options "/family_members/answer", FamilyMemberController, :options
-    options "/family_members/answer_general", FamilyMemberController, :options
+      # Family tree endpoints (protected)
+      get "/", FamilyMemberController, :family_members
+    end
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

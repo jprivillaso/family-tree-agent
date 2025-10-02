@@ -19,7 +19,7 @@ An intelligent family tree management system built with Elixir/Phoenix that comb
 ### Production Ready
 - **Health Monitoring**: Built-in health checks for all system components
 - **CORS Support**: Ready for frontend integration
-- **Database Persistence**: PostgreSQL with Ecto ORM
+- **Database Persistence**: Neo4j GraphRAG database
 - **Error Handling**: Comprehensive error responses and logging
 
 ## 🚀 Quick Start
@@ -27,7 +27,7 @@ An intelligent family tree management system built with Elixir/Phoenix that comb
 ### Prerequisites
 - Elixir 1.14+
 - Phoenix Framework
-- PostgreSQL
+- Neo4j (for GraphRAG database)
 - (Optional) OpenAI API key for enhanced AI responses
 
 ### Installation
@@ -61,7 +61,7 @@ Visit [`localhost:4000`](http://localhost:4000) - your app is ready! 🎉
 ### Core Components
 
 - **Phoenix Web Framework**: HTTP API and routing
-- **Ecto + PostgreSQL**: Data persistence and queries
+- **Neo4j GraphRAG**: Advanced graph-based data storage and retrieval
 - **GenServer Architecture**: Resilient AI system management
 - **RAG System**: AI-powered question answering with context
 
@@ -76,7 +76,7 @@ Visit [`localhost:4000`](http://localhost:4000) - your app is ready! 🎉
                                 ▼
                        ┌──────────────────┐
                        │   Family Data    │
-                       │   (PostgreSQL)   │
+                       │   (Neo4j Graph)  │
                        └──────────────────┘
 ```
 
@@ -102,19 +102,14 @@ mix dialyzer           # Type checking
 mix test               # Test suite
 ```
 
-### Database Operations
+### Neo4j Database
 
-```bash
-mix ecto.create        # Create database
-mix ecto.migrate       # Run migrations
-mix ecto.rollback      # Rollback migration
-mix ecto.reset         # Drop, create, and migrate
-```
+The application uses Neo4j as its primary database. Ensure Neo4j is running locally on `localhost:7474` with credentials `neo4j:familytree123`.
 
 ### Adding Family Data
 
 1. **Via API**: Use the POST endpoints to add members programmatically
-2. **Via Seeds**: Add data to `priv/repo/seeds.exs` and run `mix run priv/repo/seeds.exs`
+2. **Via Neo4j**: Add data directly to the Neo4j database using Cypher queries
 3. **Via JSON**: Place JSON files in `priv/family_data/` (auto-loaded by RAG system)
 
 ## 🚀 Deployment
@@ -122,11 +117,11 @@ mix ecto.reset         # Drop, create, and migrate
 ### Environment Variables
 
 ```bash
-# Database
-DATABASE_URL="ecto://user:pass@localhost/family_tree_agent_prod"
-
 # AI System (Optional)
 OPENAI_API_KEY="your-openai-api-key"
+
+# Neo4j Database (configured in application)
+# Neo4j runs on localhost:7474 with credentials neo4j:familytree123
 ```
 
 ### Health Monitoring

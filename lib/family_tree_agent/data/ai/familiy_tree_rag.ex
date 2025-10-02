@@ -7,7 +7,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
 
   alias FamilyTreeAgent.AI.FileProcessor
   alias FamilyTreeAgent.AI.InMemoryVectorStore
-  alias FamilyTreeAgent.AI.Clients.Ollama, as: OllamaClient
+  alias FamilyTreeAgent.AI.Clients.Client, as: AIClient
 
   @type t :: %__MODULE__{
           ai_client: any(),
@@ -19,13 +19,13 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
     :vector_store
   ]
 
-  def init(client_config \\ []) do
-    with {:ok, ai_client} <- OllamaClient.init(client_config) do
+  def init(_client_config) do
+    with {:ok, ai_client} <- AIClient.create() do
       IO.puts("Loading and processing documents...")
       documents = FileProcessor.load_documents!()
 
       IO.puts("Creating embeddings for #{length(documents)} chunks...")
-      documents_with_embeddings = OllamaClient.create_embeddings_batch(ai_client, documents)
+      documents_with_embeddings = AIClient.create_embeddings_batch(ai_client, documents)
 
       IO.puts("Building vector store...")
       vector_store = InMemoryVectorStore.new(documents_with_embeddings)
@@ -56,44 +56,49 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
 
     # Create a prompt that includes the RAG context (single answer format)
     prompt = """
-    Answer in one sentence. Avoid explanations about your answer.
+    You are a Family Tree assistant that ONLY answers questions about family members and relationships.
 
-    The most two common questions are:
+    CRITICAL RULE: If the question is NOT about family members, relationships, or personal information about people in the family tree, you MUST respond with exactly: "I can only answer questions about the Family Tree"
+
+    Examples of questions you should NOT answer:
+    - Programming or coding questions
+    - Technical help requests
+    - General knowledge questions
+    - Math calculations
+    - Weather, news, or current events
+    - Anything unrelated to family relationships
+
+    Examples of questions you SHOULD answer:
+    - "Who is John Doe?"
+    - "What is Mary's relationship to Peter?"
+    - "How many children does Sarah have?"
+    - "When was Michael born?"
+    - "What is Jane's occupation?"
+
+    If the question IS about family members, answer in one sentence. Avoid explanations about your answer.
+
+    The most common question types are:
 
     1. Who is the person?
     You should return the name of the person and a summary of the person's bio and relationships.
 
     Example:
     "Bill Gates is a software engineer at Microsoft. He is married to Melinda Gates and has three children."
-    "Elon Musk is a software engineer at Tesla. He is married to Grimes and has six children."
 
-    2. What is the person's relationship to the person?
-    You should return the name of the person and a summary of the person's relationship to the person.
-
-    Example:
-    "Bill Gates is the father of Melinda Gates."
-    "Elon Musk is the father of Grimes."
-
-    3. General Case
-    You should return a single line with the person's name. Try to match the question to an attribute of the person
-    - name
-    - bio
-    - relationships
-    - hobbies
-
-    Once you identify the most relevant attribute, return a summary of that attribute and the person's name.
+    2. What is the person's relationship to another person?
+    You should return the relationship between the two people.
 
     Example:
-    Q: What is John Doe's hobbies?
-    A: John Doe likes to play tennis and read books.
+    "Bill Gates is the father of Jennifer Gates."
 
-    Q: What is John Doe's relationship to Jane Doe?
-    A: John Doe is the father of Jane Doe.
+    3. General personal information
+    Try to match the question to an attribute of the person: name, bio, relationships, occupation, location, etc.
 
-    Q: What is Alice Doe's hobbies?
-    A: Alice Doe likes to read and swim.
+    Example:
+    Q: What is John Doe's occupation?
+    A: John Doe is a software engineer.
 
-    Omit using Answer, Question and explanation in your response.
+    Omit using "Answer:", "Question:" and explanations in your response.
 
     Context:
     #{context}
@@ -104,7 +109,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
 
     IO.puts("🤖 Generating AI response using RAG context...")
 
-    case OllamaClient.generate_text(rag_system.ai_client, prompt) do
+    case AIClient.generate_text(rag_system.ai_client, prompt) do
       {:ok, generated_text} ->
         "🤖 AI Response: #{generated_text}."
 
@@ -114,7 +119,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeRAG do
   end
 
   defp similarity_search(rag_system, query, k) do
-    query_embedding = OllamaClient.create_embedding(rag_system.ai_client, query)
+    query_embedding = AIClient.create_embedding(rag_system.ai_client, query)
     InMemoryVectorStore.similarity_search(rag_system.vector_store, query_embedding, k)
   end
 end

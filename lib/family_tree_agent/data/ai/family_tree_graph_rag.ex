@@ -13,7 +13,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
 
   @behaviour FamilyTreeAgent.AI.Clients.PlannerBehavior
 
-  alias FamilyTreeAgent.AI.Clients.Ollama, as: OllamaClient
+  alias FamilyTreeAgent.AI.Clients.Client, as: AIClient
   alias FamilyTreeAgent.AI.Tools.CypherGeneratorTool
   alias FamilyTreeAgent.AI.Tools.Neo4jExecutorTool
 
@@ -35,7 +35,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
   def init(config \\ []) do
     Logger.info("🔧 Initializing FamilyTreeGraphRAG...")
 
-    with {:ok, ai_client} <- OllamaClient.init(config) do
+    with {:ok, ai_client} <- AIClient.create() do
       cypher_tool = CypherGeneratorTool.init(ai_client)
       neo4j_tool = Neo4jExecutorTool.init(config)
 
@@ -146,7 +146,19 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
     results_text = format_results_for_ai(results)
 
     prompt = """
-    You are a helpful assistant that answers questions about family relationships.
+    You are a Family Tree assistant that ONLY answers questions about family members and relationships.
+
+    CRITICAL RULE: If the question is NOT about family members, relationships, or personal information about people in the family tree, you MUST respond with exactly: "I can only answer questions about the Family Tree"
+
+    Examples of questions you should NOT answer:
+    - Programming or coding questions
+    - Technical help requests
+    - General knowledge questions
+    - Math calculations
+    - Weather, news, or current events
+    - Anything unrelated to family relationships
+
+    If the question IS about family members, use the database results below to answer.
 
     Original Question: #{query}
 
@@ -165,7 +177,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
     Response:
     """
 
-    case OllamaClient.generate_text(graph_rag.ai_client, prompt) do
+    case AIClient.generate_text(graph_rag.ai_client, prompt) do
       {:ok, response} ->
         {:ok, String.trim(response)}
 
@@ -274,7 +286,7 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
       other_fields =
         result
         |> Map.drop(["name", :name, "type", :type])
-        |> Enum.map(fn {key, value} -> "#{key}: #{value}" end)
+        |> Enum.map(fn {key, value} -> "#{key}: #{format_value_safely(value)}" end)
         |> Enum.take(3)  # Limit to avoid too much text
 
       if Enum.empty?(other_fields) do
@@ -286,10 +298,48 @@ defmodule FamilyTreeAgent.AI.FamilyTreeGraphRAG do
       # No clear identifier, just show key info
       result
       |> Enum.take(3)
-      |> Enum.map(fn {key, value} -> "#{key}: #{value}" end)
+      |> Enum.map(fn {key, value} -> "#{key}: #{format_value_safely(value)}" end)
       |> Enum.join(", ")
     end
   end
+
+  # Safely format any value for string interpolation
+  defp format_value_safely(value) when is_binary(value), do: value
+  defp format_value_safely(value) when is_number(value), do: to_string(value)
+  defp format_value_safely(value) when is_atom(value), do: to_string(value)
+  defp format_value_safely(value) when is_list(value) do
+    case value do
+      [] -> "[]"
+      list when length(list) <= 3 ->
+        list
+        |> Enum.map(&format_value_safely/1)
+        |> Enum.join(", ")
+        |> then(&"[#{&1}]")
+      list ->
+        list
+        |> Enum.take(3)
+        |> Enum.map(&format_value_safely/1)
+        |> Enum.join(", ")
+        |> then(&"[#{&1}...]")
+    end
+  end
+  defp format_value_safely(value) when is_map(value) do
+    # For maps, try to extract key information
+    cond do
+      Map.has_key?(value, "name") -> Map.get(value, "name")
+      Map.has_key?(value, :name) -> Map.get(value, :name)
+      Map.has_key?(value, "title") -> Map.get(value, "title")
+      Map.has_key?(value, :title) -> Map.get(value, :title)
+      true ->
+        # Fallback: show first few key-value pairs
+        value
+        |> Enum.take(2)
+        |> Enum.map(fn {k, v} -> "#{k}:#{format_value_safely(v)}" end)
+        |> Enum.join(",")
+        |> then(&"{#{&1}}")
+    end
+  end
+  defp format_value_safely(value), do: inspect(value, limit: 50)
 
   defp format_raw_results(results) when is_list(results) do
     results

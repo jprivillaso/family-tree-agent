@@ -31,7 +31,6 @@ defmodule FamilyTreeAgentWeb.Endpoint do
     socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
     plug Phoenix.LiveReloader
     plug Phoenix.CodeReloader
-    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :family_tree_agent
   end
 
   plug Phoenix.LiveDashboard.RequestLogger,
@@ -49,5 +48,13 @@ defmodule FamilyTreeAgentWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
+
+  # CORS configuration
+  plug CORSPlug,
+    origin: ["*"],
+    credentials: true,
+    max_age: 86400,
+    headers: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent", "DNT", "Cache-Control", "X-Mx-ReqToken", "Keep-Alive", "X-Requested-With", "If-Modified-Since", "X-CSRF-Token"]
+
   plug FamilyTreeAgentWeb.Router
 end
