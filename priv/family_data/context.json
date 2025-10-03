@@ -127,7 +127,18 @@
       "gender": "male",
       "relationships": {
         "spouse": "Florentina Corrêa de Magalhaes",
-        "children": ["Cleolice Magalhaes de Souza Lima"]
+        "children": [
+          "Cleolice Magalhaes de Souza Lima",
+          "Alzemar Argemiro de Magalhaes",
+          "Alzemiro Argemiro de Magalhaes",
+          "Neusa de Magalhaes Prates",
+          "Neyde Argemiro de Magalhaes",
+          "Cleudes de Magalhaes Mendes",
+          "Cleusa Argemiro de Magalhaes",
+          "Argemiro Moacyr de Magalhaes",
+          "Leyde Argemiro de Magalhaes",
+          "Eunice Argemiro de Magalhaes"
+        ]
       },
       "metadata": {
         "occupation": "Farmer",
@@ -135,14 +146,66 @@
       }
     },
     {
+      "name": "Iracy Argemiro de Magalhaes",
+      "birth_date": "01-01-1900",
+      "death_date": "01-01-1970",
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "Farmer",
+        "location": "Corinto, Brazil"
+      }
+    },
+    {
+      "name": "Argemiro de Magalhaes",
+      "birth_date": "01-01-1900",
+      "death_date": "01-01-1970",
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "Dentist",
+        "location": "Corinto, Brazil"
+      },
+      "relationships": {
+        "spouse": "Angelica de Magalhaes",
+        "children": ["Iracy Argemiro de Magalhaes", "Moacyr Argemiro de Magalhaes"]
+      }
+    },
+    {
+      "name": "Angelica de Magalhaes",
+      "birth_date": "01-01-1900",
+      "death_date": "01-01-1970",
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "Farmer",
+        "location": "Corinto, Brazil"
+      },
+      "relationships": {
+        "spouse": "Argemiro de Magalhaes",
+        "children": ["Iracy Argemiro de Magalhaes", "Moacyr Argemiro de Magalhaes"]
+      }
+    },
+    {
       "name": "Florentina Corrêa de Magalhaes",
       "birth_date": "09-17-1917",
-      "death_date": null,
+      "death_date": "01-01-1970",
       "bio": "",
       "gender": "female",
       "relationships": {
         "spouse": "Moacyr Argemiro de Magalhaes",
-        "children": ["Cleolice Magalhaes de Souza Lima"]
+        "children": [
+          "Cleolice Magalhaes de Souza Lima",
+          "Alzemar Argemiro de Magalhaes",
+          "Alzemiro Argemiro de Magalhaes",
+          "Neusa de Magalhaes Prates",
+          "Neyde Argemiro de Magalhaes",
+          "Cleudes de Magalhaes Mendes",
+          "Cleusa Argemiro de Magalhaes",
+          "Argemiro Moacyr de Magalhaes",
+          "Leyde Argemiro de Magalhaes",
+          "Eunice Argemiro de Magalhaes"
+        ]
       },
       "metadata": {
         "occupation": "Farmer",
@@ -205,6 +268,337 @@
       "metadata": {
         "occupation": "Student",
         "location": "Barranquilla, Colombia"
+      }
+    },
+    {
+      "name": "Alzemar Argemiro de Magalhaes",
+      "birth_date": "09-06-1951",
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "Doctor",
+        "location": "Belo Horizonte, Brazil"
+      }
+    },
+    {
+      "name": "Alzemiro Argemiro de Magalhaes",
+      "birth_date": "04-26-1947",
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "Businessman",
+        "location": "Sete Lagoas, Brazil"
+      }
+    },
+    {
+      "name": "Neusa de Magalhaes Prates",
+      "birth_date": "05-23-1941",
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "Teacher",
+        "location": "Belo Horizonte, Brazil"
+      }
+    },
+    {
+      "name": "Neyde Argemiro de Magalhaes",
+      "birth_date": "07-01-1939",
+      "death_date": "01-01-2022",
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "Teacher",
+        "location": "Belo Horizonte, Brazil"
+      }
+    },
+    {
+      "name": "Cleudes de Magalhaes Mendes",
+      "birth_date": "10-12-1938",
+      "death_date": "12-05-2020",
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "Teacher",
+        "location": "Belo Horizonte, Brazil"
+      }
+    },
+    {
+      "name": "Cleusa Argemiro de Magalhaes",
+      "birth_date": "02-26-1946",
+      "death_date": "05-09-2023",
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "Teacher",
+        "location": "Belo Horizonte, Brazil"
+      }
+    },
+    {
+      "name": "Argemiro Moacyr de Magalhaes",
+      "birth_date": "11-23-1940",
+      "death_date": "01-01-2000",
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "Agricultural Engineer",
+        "location": "Belo Horizonte, Brazil"
+      }
+    },
+    {
+      "name": "Leyde Argemiro de Magalhaes",
+      "birth_date": "11-02-1942",
+      "death_date": "01-01-2000",
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "Teacher",
+        "location": "Belo Horizonte, Brazil"
+      }
+    },
+    {
+      "name": "Eunice Argemiro de Magalhaes",
+      "birth_date": "02-01-1952",
+      "death_date": null,
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "Psychologist",
+        "location": "Belo Horizonte, Brazil"
+      }
+    },
+    {
+      "name": "Luis Fernando Ospina Montoya",
+      "birth_date": "01-01-1945",
+      "death_date": null,
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "Industrial Engineer",
+        "location": "Rionegro, Colombia"
+      }
+    },
+    {
+      "name": "Graciela del Socorro Ospina Montoya",
+      "birth_date": "01-01-1900",
+      "death_date": null,
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "Industrial Engineer",
+        "location": "Cape Coral, United States"
+      }
+    },
+    {
+      "name": "Gildardo Ospina Montoya",
+      "birth_date": "01-01-1900",
+      "death_date": null,
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "N/A",
+        "location": "Rionegro, Colombia"
+      }
+    },
+    {
+      "name": "Leon Mario Ospina Montoya",
+      "birth_date": "01-01-1900",
+      "death_date": null,
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "Security Guard",
+        "location": "Rionegro, Colombia"
+      }
+    },
+    {
+      "name": "Asdrubal de Jesus Ospina Montoya",
+      "birth_date": "01-01-1900",
+      "death_date": null,
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "Security Guard",
+        "location": "Rionegro, Colombia"
+      }
+    },
+    {
+      "name": "Waldina Montoya",
+      "birth_date": "06-13-1933",
+      "death_date": null,
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "N/A",
+        "location": "Rionegro, Colombia"
+      },
+      "relationships": {
+        "spouse": "Jesus Antonio Ospina",
+        "children": ["Luis Fernando Ospina Montoya", "Graciela del Socorro Ospina Montoya", "Gildardo Ospina Montoya", "Leon Mario Ospina Montoya", "Asdrubal de Jesus Ospina Montoya", "Rosalba del Consuelo Ospina Montoya"]
+      }
+    },
+    {
+      "name": "Jesus Antonio Ospina",
+      "birth_date": "01-01-1927",
+      "death_date": "01-01-2001",
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "Businessman",
+        "location": "Rionegro, Colombia"
+      }
+    },
+    {
+      "name": "Alonso Rivillas",
+      "birth_date": "01-01-1927",
+      "death_date": "01-01-2001",
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "N/A",
+        "location": "Rionegro, Colombia"
+      },
+      "relationships": {
+        "spouse": "Romelia Zapata",
+        "children": ["Tulio Mario Rivillas Zapata", "Marta Cecilia Rivillas Zapata", "Amilkar Rivillas", "Ruben Dario Rivillas Zapata", "Luz Marina Rivillas Zapata", "Gloria Rivillas Zapata", "Mercedez Rivillas Zapata", "Lucelly Rivillas Zapata"]
+      }
+    },
+    {
+      "name": "Romelia Zapata",
+      "birth_date": "01-01-1927",
+      "death_date": "01-01-2001",
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "N/A",
+        "location": "Rionegro, Colombia"
+      },
+      "relationships": {
+        "spouse": "Alonso Rivillas",
+        "children": ["Tulio Mario Rivillas Zapata", "Marta Cecilia Rivillas Zapata", "Amilkar Rivillas", "Ruben Dario Rivillas Zapata", "Luz Marina Rivillas Zapata", "Gloria Rivillas Zapata", "Mercedez Rivillas Zapata", "Lucelly Rivillas Zapata"]
+      }
+    },
+    {
+      "name": "Marta Cecilia Rivillas Zapata",
+      "birth_date": "01-01-1927",
+      "death_date": null,
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "N/A",
+        "location": "Medellin, Colombia"
+      },
+      "relationships": {
+        "spouse": "Dario",
+        "children": []
+      }
+    },
+    {
+      "name": "Dario",
+      "birth_date": "01-01-1927",
+      "death_date": null,
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "N/A",
+        "location": "Medellin, Colombia"
+      }
+    },
+    {
+      "name": "Lucelly Rivillas Zapata",
+      "birth_date": "01-01-1927",
+      "death_date": null,
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "",
+        "location": "Medellin, Colombia"
+      }
+    },
+    {
+      "name": "Gloria Rivillas Zapata",
+      "birth_date": "01-01-1927",
+      "death_date": null,
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "N/A",
+        "location": "Medellin, Colombia"
+      },
+      "relationships": {
+        "spouse": "Gabriel Sepulveda",
+        "children": []
+      }
+    },
+    {
+      "name": "Amilkar Rivillas",
+      "birth_date": "01-01-1927",
+      "death_date": null,
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "N/A",
+        "location": "Rionegro, Colombia"
+      },
+      "relationships": {
+        "spouse": "Dolly Sanchez",
+        "children": []
+      }
+    },
+    {
+      "name": "Dolly Sanchez",
+      "birth_date": "01-01-1927",
+      "death_date": null,
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "N/A",
+        "location": "Rionegro, Colombia"
+      }
+    },
+    {
+      "name": "Ruben Dario Rivillas Zapata",
+      "birth_date": "01-01-1927",
+      "death_date": null,
+      "bio": "",
+      "gender": "male",
+      "metadata": {
+        "occupation": "N/A",
+        "location": "Chicago, United States"
+      },
+      "relationships": {
+        "spouse": "Luz Arenas",
+        "children": []
+      }
+    },
+    {
+      "name": "Luz Marina Rivillas Zapata",
+      "birth_date": "01-01-1927",
+      "death_date": null,
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "N/A",
+        "location": "Rionegro, Colombia"
+      }
+    },
+    {
+      "name": "Luz Arenas",
+      "birth_date": "01-01-1927",
+      "death_date": null,
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "N/A"
+      }
+    },
+    {
+      "name": "Mercedez Rivillas Zapata",
+      "birth_date": "01-01-1927",
+      "death_date": null,
+      "bio": "",
+      "gender": "female",
+      "metadata": {
+        "occupation": "N/A"
       }
     }
   ]
